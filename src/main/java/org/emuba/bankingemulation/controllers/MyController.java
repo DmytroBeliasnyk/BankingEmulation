@@ -1,10 +1,10 @@
-package org.emuba.bankingemulation.controller;
+package org.emuba.bankingemulation.controllers;
 
 import org.emuba.bankingemulation.dto.AccountDTO;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.enums.UserRole;
-import org.emuba.bankingemulation.service.AccountService;
-import org.emuba.bankingemulation.service.impl.ClientServiceImpl;
+import org.emuba.bankingemulation.services.AccountService;
+import org.emuba.bankingemulation.services.impl.ClientServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;

@@ -1,8 +1,8 @@
-package org.emuba.bankingemulation.service;
+package org.emuba.bankingemulation.services;
 
 import org.emuba.bankingemulation.dto.ClientDTO;
 import org.emuba.bankingemulation.enums.UserRole;
-import org.emuba.bankingemulation.model.CustomClient;
+import org.emuba.bankingemulation.models.CustomClient;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;

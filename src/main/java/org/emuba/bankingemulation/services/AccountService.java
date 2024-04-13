@@ -1,4 +1,4 @@
-package org.emuba.bankingemulation.service;
+package org.emuba.bankingemulation.services;
 
 import org.emuba.bankingemulation.dto.AccountDTO;
 import org.emuba.bankingemulation.enums.TypeCurrency;

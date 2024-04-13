@@ -1,8 +1,7 @@
-package org.emuba.bankingemulation.repository;
+package org.emuba.bankingemulation.repositories;
 
 import org.emuba.bankingemulation.enums.TypeCurrency;
-import org.emuba.bankingemulation.model.Account;
-import org.emuba.bankingemulation.model.CustomClient;
+import org.emuba.bankingemulation.models.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

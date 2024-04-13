@@ -2,7 +2,6 @@ package org.emuba.bankingemulation.dto;
 
 import lombok.Data;
 import org.emuba.bankingemulation.enums.TypeCurrency;
-import org.emuba.bankingemulation.model.Account;
 
 @Data
 public class AccountDTO {

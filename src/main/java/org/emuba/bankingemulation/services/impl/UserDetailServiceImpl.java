@@ -1,6 +1,6 @@
-package org.emuba.bankingemulation.service.impl;
+package org.emuba.bankingemulation.services.impl;
 
-import org.emuba.bankingemulation.model.CustomClient;
+import org.emuba.bankingemulation.models.CustomClient;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;

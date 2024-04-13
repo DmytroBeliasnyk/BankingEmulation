@@ -1,7 +1,7 @@
-package org.emuba.bankingemulation.config;
+package org.emuba.bankingemulation.configs;
 
 import org.emuba.bankingemulation.enums.UserRole;
-import org.emuba.bankingemulation.service.impl.ClientServiceImpl;
+import org.emuba.bankingemulation.services.impl.ClientServiceImpl;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

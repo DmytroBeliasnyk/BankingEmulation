@@ -1,4 +1,4 @@
-package org.emuba.bankingemulation.model;
+package org.emuba.bankingemulation.models;
 
 import java.util.HashSet;
 import java.util.Random;
