@@ -1,10 +1,7 @@
 package org.emuba.bankingemulation.config;
 
-import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.enums.UserRole;
-import org.emuba.bankingemulation.model.Account;
-import org.emuba.bankingemulation.model.CustomClient;
-import org.emuba.bankingemulation.service.ClientServiceImpl;
+import org.emuba.bankingemulation.service.impl.ClientServiceImpl;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package org.emuba.bankingemulation.service;
+package org.emuba.bankingemulation.service.impl;
 
 import org.emuba.bankingemulation.model.CustomClient;
 import org.springframework.security.core.GrantedAuthority;
@@ -9,13 +9,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
 public class UserDetailServiceImpl implements UserDetailsService {
-    private final  ClientServiceImpl clientService;
+    private final ClientServiceImpl clientService;
 
     public UserDetailServiceImpl(ClientServiceImpl clientService) {
         this.clientService = clientService;

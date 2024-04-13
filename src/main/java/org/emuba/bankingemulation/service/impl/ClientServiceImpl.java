@@ -1,4 +1,4 @@
-package org.emuba.bankingemulation.service;
+package org.emuba.bankingemulation.service.impl;
 
 import org.emuba.bankingemulation.dto.ClientDTO;
 import org.emuba.bankingemulation.enums.TypeCurrency;
@@ -6,7 +6,7 @@ import org.emuba.bankingemulation.enums.UserRole;
 import org.emuba.bankingemulation.model.Account;
 import org.emuba.bankingemulation.model.CustomClient;
 import org.emuba.bankingemulation.repository.ClientRepository;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import org.emuba.bankingemulation.service.ClientService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
