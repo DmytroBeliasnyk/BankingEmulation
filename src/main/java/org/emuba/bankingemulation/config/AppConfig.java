@@ -1,0 +1,28 @@
+package org.emuba.bankingemulation.config;
+
+import org.emuba.bankingemulation.enums.TypeCurrency;
+import org.emuba.bankingemulation.enums.UserRole;
+import org.emuba.bankingemulation.model.Account;
+import org.emuba.bankingemulation.model.CustomClient;
+import org.emuba.bankingemulation.service.ClientServiceImpl;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+@Configuration
+public class AppConfig {
+    @Bean
+    public CommandLineRunner commandLineRunner(final ClientServiceImpl clientService,
+                                               final PasswordEncoder encoder) {
+        return new CommandLineRunner() {
+            @Override
+            public void run(String... args) throws Exception {
+                clientService.addClient("Admin", "Admin", null,
+                        "admin", encoder.encode("admin"), UserRole.ADMIN);
+                clientService.addClient("User", "User", null,
+                        "user", encoder.encode("user"), UserRole.USER);
+            }
+        };
+    }
+}
