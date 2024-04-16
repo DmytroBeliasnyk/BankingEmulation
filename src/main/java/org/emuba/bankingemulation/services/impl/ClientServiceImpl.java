@@ -30,7 +30,15 @@ public class ClientServiceImpl implements ClientService {
         CustomClient client = CustomClient.of(name, surname, email, login, passHash, role);
         if (role != UserRole.ADMIN)
             client.addAccount(Account.of(TypeCurrency.UAH));
+        if (countClients() == 1)
+            client.addAccount(Account.of(TypeCurrency.USD));
         clientRepository.save(client);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CustomClient findById(Long id) {
+        return clientRepository.findById(id).get();
     }
 
     @Override

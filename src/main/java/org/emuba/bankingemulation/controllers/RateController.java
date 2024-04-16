@@ -1,8 +1,6 @@
 package org.emuba.bankingemulation.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.emuba.bankingemulation.dto.CurrencyRateDTO;
-import org.emuba.bankingemulation.models.CurrencyRate;
 import org.emuba.bankingemulation.retrievers.CurrencyRatesRetriever;
 import org.emuba.bankingemulation.services.impl.RateServiceImpl;
 import org.springframework.http.HttpStatus;
@@ -11,11 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 
 @RestController
 public class RateController {

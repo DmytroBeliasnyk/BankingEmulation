@@ -25,7 +25,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public void addNewAccount(TypeCurrency currency, String login) {
-        if (findAccount(currency, login) != null)
+        if (findAccount(currency, login).isPresent())
             return;
         CustomClient client = clientService.findClientByLogin(login);
         Account newAccount = Account.of(currency);
@@ -35,15 +35,19 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional(readOnly = true)
-    public AccountDTO findAccount(TypeCurrency currency, String login) {
-        Optional<Account> opt = accountRepository.
-                findByCurrencyAndClient_Login(currency, login);
-        return opt.map(Account::toDTO).orElse(null);
+    public Optional<Account> findAccount(TypeCurrency currency, String login) {
+        return accountRepository.findByCurrencyAndClient_Login(currency, login);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Account> findAccountByNumber(String accountNumber) {
+        return accountRepository.findAccountByAccountNumber(accountNumber);
     }
 
     @Override
     @Transactional
-    public void updateBalance(Long clientId, TypeCurrency currency, long newBalance) {
+    public synchronized void updateBalance(Long clientId, TypeCurrency currency, double newBalance) {
         accountRepository.updateBalance(clientId, currency, newBalance);
     }
 }

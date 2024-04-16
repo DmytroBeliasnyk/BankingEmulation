@@ -12,6 +12,8 @@ public interface ClientService {
     void addClient(String name, String surname, String email,
                    String login, String passHash, UserRole role);
 
+    CustomClient findById(Long id);
+
     List<ClientDTO> findAllClients(Pageable pageable);
 
     CustomClient findClientByLogin(String login);
@@ -19,5 +21,6 @@ public interface ClientService {
     long findClientId(String login);
 
     List<String> findAllLogins();
+
     long countClients();
 }

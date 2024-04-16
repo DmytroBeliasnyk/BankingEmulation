@@ -1,12 +1,16 @@
 package org.emuba.bankingemulation.services;
 
-import org.emuba.bankingemulation.dto.AccountDTO;
 import org.emuba.bankingemulation.enums.TypeCurrency;
+import org.emuba.bankingemulation.models.Account;
+
+import java.util.Optional;
 
 public interface AccountService {
     void addNewAccount(TypeCurrency currency, String login);
 
-    AccountDTO findAccount(TypeCurrency currency, String login);
+    Optional<Account> findAccount(TypeCurrency currency, String login);
 
-    void updateBalance(Long id, TypeCurrency currency, long newBalance);
+    Optional<Account> findAccountByNumber(String accountNumber);
+
+    void updateBalance(Long clientId, TypeCurrency currency, double newBalance);
 }

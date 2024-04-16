@@ -3,6 +3,8 @@ package org.emuba.bankingemulation.controllers;
 import org.emuba.bankingemulation.dto.ClientDTO;
 import org.emuba.bankingemulation.dto.PageCountDTO;
 import org.emuba.bankingemulation.enums.TypeCurrency;
+import org.emuba.bankingemulation.models.Account;
+import org.emuba.bankingemulation.models.CustomClient;
 import org.emuba.bankingemulation.services.impl.AccountServiceImpl;
 import org.emuba.bankingemulation.services.impl.ClientServiceImpl;
 import org.springframework.data.domain.PageRequest;
@@ -42,12 +44,15 @@ public class AdminController {
 
     @GetMapping("add_money")
     public ResponseEntity<Void> addMoney(@RequestParam Long clientId,
-                                         @RequestParam long amount) {
-        if (amount < 0)
+                                         @RequestParam double amount) {
+        if (amount <= 0)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if (amount == 0)
-            return new ResponseEntity<>(HttpStatus.OK);
-        accountService.updateBalance(clientId, TypeCurrency.UAH, amount);
+        CustomClient client = clientService.findById(clientId);
+        Account account = accountService.
+                findAccount(TypeCurrency.UAH, client.getLogin()).get();
+        account.setBalance(account.getBalance() + amount);
+
+        accountService.updateBalance(clientId, TypeCurrency.UAH, account.getBalance());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
