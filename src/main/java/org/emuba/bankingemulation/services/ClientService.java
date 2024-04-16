@@ -19,4 +19,5 @@ public interface ClientService {
     long findClientId(String login);
 
     List<String> findAllLogins();
+    long countClients();
 }

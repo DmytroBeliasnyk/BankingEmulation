@@ -7,4 +7,6 @@ public interface AccountService {
     void addNewAccount(TypeCurrency currency, String login);
 
     AccountDTO findAccount(TypeCurrency currency, String login);
+
+    void updateBalance(Long id, TypeCurrency currency, long newBalance);
 }

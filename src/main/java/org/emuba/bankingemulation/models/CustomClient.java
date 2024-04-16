@@ -3,11 +3,13 @@ package org.emuba.bankingemulation.models;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.emuba.bankingemulation.dto.AccountDTO;
 import org.emuba.bankingemulation.dto.ClientDTO;
 import org.emuba.bankingemulation.enums.UserRole;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -26,7 +28,7 @@ public class CustomClient {
     private UserRole role;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-    private List<Account> Accounts = new ArrayList<>();
+    private List<Account> accounts = new ArrayList<>();
 
     private CustomClient(String name, String surname, String email,
                          String login, String password, UserRole role) {
@@ -39,8 +41,8 @@ public class CustomClient {
     }
 
     public void addAccount(Account Account) {
-        if (!Accounts.contains(Account)) {
-            Accounts.add(Account);
+        if (!accounts.contains(Account)) {
+            accounts.add(Account);
             Account.setClient(this);
         }
     }
@@ -51,6 +53,9 @@ public class CustomClient {
     }
 
     public ClientDTO toDTO() {
-        return ClientDTO.of(name, surname, email);
+        List<AccountDTO> list = accounts.stream()
+                .map(Account::toDTO)
+                .toList();
+        return ClientDTO.of(id, name, surname, email, list);
     }
 }

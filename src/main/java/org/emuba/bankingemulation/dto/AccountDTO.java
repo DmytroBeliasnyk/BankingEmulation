@@ -7,15 +7,15 @@ import org.emuba.bankingemulation.enums.TypeCurrency;
 public class AccountDTO {
     private String accountNumber;
     private TypeCurrency currency;
-    private double amountMoney;
+    private double balance;
 
-    private AccountDTO(String accountNumber, TypeCurrency currency, double amountMoney) {
+    private AccountDTO(String accountNumber, TypeCurrency currency, double balance) {
         this.accountNumber = accountNumber;
         this.currency = currency;
-        this.amountMoney = amountMoney;
+        this.balance = balance;
     }
 
-    public static AccountDTO of(String accountNumber, TypeCurrency currency, double amountMoney) {
-        return new AccountDTO(accountNumber, currency, amountMoney);
+    public static AccountDTO of(String accountNumber, TypeCurrency currency, double balance) {
+        return new AccountDTO(accountNumber, currency, balance);
     }
 }

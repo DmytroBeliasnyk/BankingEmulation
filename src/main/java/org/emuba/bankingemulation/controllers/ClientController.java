@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-public class MyController {
+public class ClientController {
     private final ClientServiceImpl clientService;
     private final AccountService accountService;
     private final PasswordEncoder encoder;
 
-    public MyController(ClientServiceImpl clientService, AccountService accountService,
-                        PasswordEncoder encoder) {
+    public ClientController(ClientServiceImpl clientService, AccountService accountService,
+                            PasswordEncoder encoder) {
         this.clientService = clientService;
         this.accountService = accountService;
         this.encoder = encoder;

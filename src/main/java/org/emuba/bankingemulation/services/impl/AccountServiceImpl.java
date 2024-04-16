@@ -40,4 +40,10 @@ public class AccountServiceImpl implements AccountService {
                 findByCurrencyAndClient_Login(currency, login);
         return opt.map(Account::toDTO).orElse(null);
     }
+
+    @Override
+    @Transactional
+    public void updateBalance(Long clientId, TypeCurrency currency, long newBalance) {
+        accountRepository.updateBalance(clientId, currency, newBalance);
+    }
 }

@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ClientServiceImpl implements ClientService {
@@ -35,13 +36,11 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional(readOnly = true)
     public List<ClientDTO> findAllClients(Pageable pageable) {
-        List<CustomClient> clients = clientRepository.findAll(pageable).getContent();
-        List<ClientDTO> res = new ArrayList<>();
-
-        clients.stream()
+        return clientRepository.findAll(pageable).getContent()
+                .stream()
                 .filter(c -> c.getRole() == UserRole.USER)
-                .forEach(c -> res.add(c.toDTO()));
-        return res;
+                .map(CustomClient::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -60,5 +59,11 @@ public class ClientServiceImpl implements ClientService {
     @Transactional(readOnly = true)
     public List<String> findAllLogins() {
         return clientRepository.findAllLogins();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countClients() {
+        return clientRepository.count();
     }
 }

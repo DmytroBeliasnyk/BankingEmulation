@@ -21,7 +21,7 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private TypeCurrency currency;
 
-    private double amountMoney;
+    private double balance;
 
     private Account(TypeCurrency currency) {
         this.currency = currency;
@@ -34,6 +34,6 @@ public class Account {
     }
 
     public AccountDTO toDTO() {
-        return AccountDTO.of(accountNumber, currency, amountMoney);
+        return AccountDTO.of(accountNumber, currency, balance);
     }
 }
