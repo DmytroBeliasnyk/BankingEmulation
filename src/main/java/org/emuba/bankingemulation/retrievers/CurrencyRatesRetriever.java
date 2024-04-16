@@ -1,10 +1,8 @@
 package org.emuba.bankingemulation.retrievers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.emuba.bankingemulation.dto.CurrencyRateDTO;
 import org.emuba.bankingemulation.models.CurrencyRate;
 import org.emuba.bankingemulation.services.impl.RateServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;

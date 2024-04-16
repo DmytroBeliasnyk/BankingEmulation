@@ -30,6 +30,12 @@ public class CustomClient {
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private List<Account> accounts = new ArrayList<>();
 
+    @OneToMany(mappedBy = "from", cascade = CascadeType.ALL)
+    private List<HistoryOfTransaction> historyFrom = new ArrayList<>();
+
+    @OneToMany(mappedBy = "to", cascade = CascadeType.ALL)
+    private List<HistoryOfTransaction> historyTo = new ArrayList<>();
+
     private CustomClient(String name, String surname, String email,
                          String login, String password, UserRole role) {
         this.name = name;

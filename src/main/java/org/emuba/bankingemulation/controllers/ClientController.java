@@ -6,7 +6,6 @@ import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.enums.UserRole;
 import org.emuba.bankingemulation.models.Account;
 import org.emuba.bankingemulation.retrievers.CurrencyRatesRetriever;
-import org.emuba.bankingemulation.services.AccountService;
 import org.emuba.bankingemulation.services.impl.AccountServiceImpl;
 import org.emuba.bankingemulation.services.impl.ClientServiceImpl;
 import org.emuba.bankingemulation.services.impl.RateServiceImpl;
@@ -16,7 +15,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,10 +27,9 @@ public class ClientController {
     private final ClientServiceImpl clientService;
     private final AccountServiceImpl accountService;
     private final RateServiceImpl rateService;
-    private final CurrencyRatesRetriever retriever;
-    private final PasswordEncoder encoder;
 
-    public ClientController(ClientServiceImpl clientService, AccountServiceImpl accountService, RateServiceImpl rateService, CurrencyRatesRetriever retriever,
+    public ClientController(ClientServiceImpl clientService, AccountServiceImpl accountService,
+                            RateServiceImpl rateService, CurrencyRatesRetriever retriever,
                             PasswordEncoder encoder) {
         this.clientService = clientService;
         this.accountService = accountService;
@@ -40,6 +37,9 @@ public class ClientController {
         this.retriever = retriever;
         this.encoder = encoder;
     }
+
+    private final CurrencyRatesRetriever retriever;
+    private final PasswordEncoder encoder;
 
     @GetMapping("/register")
     public ResponseEntity<Void> register(@RequestParam String name,
@@ -133,7 +133,7 @@ public class ClientController {
     }
 
     private boolean check(String currency) {
-        if (currency == null)
+        if (currency == null || currency.equalsIgnoreCase("UAH"))
             return true;
         try {
             TypeCurrency typeOfCurrency = TypeCurrency.valueOf(currency.toUpperCase());

@@ -1,6 +1,5 @@
 package org.emuba.bankingemulation.services.impl;
 
-import org.emuba.bankingemulation.dto.AccountDTO;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.models.Account;
 import org.emuba.bankingemulation.models.CustomClient;

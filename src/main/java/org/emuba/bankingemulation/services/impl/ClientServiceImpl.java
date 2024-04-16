@@ -30,7 +30,7 @@ public class ClientServiceImpl implements ClientService {
         CustomClient client = CustomClient.of(name, surname, email, login, passHash, role);
         if (role != UserRole.ADMIN)
             client.addAccount(Account.of(TypeCurrency.UAH));
-        if (countClients() == 1)
+        if (countClients() == 1) //delete after
             client.addAccount(Account.of(TypeCurrency.USD));
         clientRepository.save(client);
     }
