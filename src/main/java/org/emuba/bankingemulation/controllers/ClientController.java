@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,8 +40,8 @@ public class ClientController {
     private final PasswordEncoder encoder;
 
     public ClientController(ClientServiceImpl clientService, AccountServiceImpl accountService,
-                            RateServiceImpl rateService, HistoryServiceImpl historyService, CurrencyRatesRetriever retriever,
-                            PasswordEncoder encoder) {
+                            RateServiceImpl rateService, HistoryServiceImpl historyService,
+                            CurrencyRatesRetriever retriever, PasswordEncoder encoder) {
         this.clientService = clientService;
         this.accountService = accountService;
         this.rateService = rateService;
@@ -97,25 +98,25 @@ public class ClientController {
     }
 
     @GetMapping("/do_transaction")
-    public ResponseEntity<?> doTransaction(@RequestParam(name = "currency") String fromCurrency,
-                                           @RequestParam(name = "account_number") String toAccountNumber,
-                                           @RequestParam(name = "amount") double amount) {
+    public ResponseEntity<Void> doTransaction(@RequestParam(name = "currency") String fromCurrency,
+                                              @RequestParam(name = "account_number") String toAccountNumber,
+                                              @RequestParam(name = "amount") double amount) {
         if (fromCurrency == null || toAccountNumber == null
                 || amount < 5 || check(fromCurrency))
-            return new ResponseEntity<>("e1", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Optional<Account> optFrom = accountService.findAccount(
                 TypeCurrency.valueOf(fromCurrency.toUpperCase()), getCurrentUser().getUsername());
         Optional<Account> optTo = accountService.findAccountByNumber(toAccountNumber);
 
         if (optFrom.isEmpty() || optTo.isEmpty())
-            return new ResponseEntity<>("2", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Account from = optFrom.get();
         Account to = optTo.get();
 
         if (from.getBalance() < amount || from.getAccountNumber().equals(to.getAccountNumber()))
-            return new ResponseEntity<>("3", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         double convertedAmount = amount;
         if (from.getCurrency() != to.getCurrency()) {
@@ -134,6 +135,14 @@ public class ClientController {
                 to.getClient(), toAccountNumber, to.getCurrency(), LocalDateTime.now(), amount);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/confirm")
+    public ResponseEntity<Void> confirm(@RequestParam String password) {
+        if (encoder.encode(password).equals(getCurrentUser().getPassword()))
+            return new ResponseEntity<>(HttpStatus.OK);
+        else
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/transactions")
