@@ -43,7 +43,7 @@ public class Account {
         return AccountDTO.of(accountNumber, currency, balance);
     }
 
-    public class AccountNumberGenerator {
+    public static class AccountNumberGenerator {
 
         private static final int ACCOUNT_NUMBER_LENGTH = 16;
         private static final Random random = new Random();
