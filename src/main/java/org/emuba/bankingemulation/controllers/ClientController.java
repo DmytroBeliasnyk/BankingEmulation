@@ -136,7 +136,7 @@ public class ClientController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/transacions")
+    @GetMapping("/transactions")
     public List<TransactionDTO> getTransacions(@RequestParam(defaultValue = "0") int page) {
         return historyService.findByClientLogin(getCurrentUser().getUsername(),
                 PageRequest.of(page, 10, Sort.Direction.DESC, "id"));
