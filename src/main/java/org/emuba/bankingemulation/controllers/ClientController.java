@@ -2,13 +2,19 @@ package org.emuba.bankingemulation.controllers;
 
 import org.emuba.bankingemulation.dto.AccountDTO;
 import org.emuba.bankingemulation.dto.CurrencyRateDTO;
+import org.emuba.bankingemulation.dto.PageCountDTO;
+import org.emuba.bankingemulation.dto.TransactionDTO;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.enums.UserRole;
 import org.emuba.bankingemulation.models.Account;
 import org.emuba.bankingemulation.retrievers.CurrencyRatesRetriever;
 import org.emuba.bankingemulation.services.impl.AccountServiceImpl;
 import org.emuba.bankingemulation.services.impl.ClientServiceImpl;
+import org.emuba.bankingemulation.services.impl.HistoryServiceImpl;
 import org.emuba.bankingemulation.services.impl.RateServiceImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,19 +34,20 @@ public class ClientController {
     private final ClientServiceImpl clientService;
     private final AccountServiceImpl accountService;
     private final RateServiceImpl rateService;
+    private final HistoryServiceImpl historyService;
+    private final CurrencyRatesRetriever retriever;
+    private final PasswordEncoder encoder;
 
     public ClientController(ClientServiceImpl clientService, AccountServiceImpl accountService,
-                            RateServiceImpl rateService, CurrencyRatesRetriever retriever,
+                            RateServiceImpl rateService, HistoryServiceImpl historyService, CurrencyRatesRetriever retriever,
                             PasswordEncoder encoder) {
         this.clientService = clientService;
         this.accountService = accountService;
         this.rateService = rateService;
+        this.historyService = historyService;
         this.retriever = retriever;
         this.encoder = encoder;
     }
-
-    private final CurrencyRatesRetriever retriever;
-    private final PasswordEncoder encoder;
 
     @GetMapping("/register")
     public ResponseEntity<Void> register(@RequestParam String name,
@@ -66,7 +74,7 @@ public class ClientController {
 
     @GetMapping("/get_account")
     public ResponseEntity<AccountDTO> getAccount(@RequestParam String currency) {
-        if (check(currency))
+        if (check(currency) || currency.equalsIgnoreCase("uah"))
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         TypeCurrency typeOfCurrency = TypeCurrency.valueOf(currency.toUpperCase());
 
@@ -88,26 +96,26 @@ public class ClientController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("do_transaction")
-    public ResponseEntity<Void> doTransaction(@RequestParam(name = "currency") String fromCurrency,
-                                              @RequestParam(name = "account_number") String toAccountNumber,
-                                              @RequestParam(name = "amount") double amount) {
+    @GetMapping("/do_transaction")
+    public ResponseEntity<?> doTransaction(@RequestParam(name = "currency") String fromCurrency,
+                                           @RequestParam(name = "account_number") String toAccountNumber,
+                                           @RequestParam(name = "amount") double amount) {
         if (fromCurrency == null || toAccountNumber == null
                 || amount < 5 || check(fromCurrency))
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("e1", HttpStatus.BAD_REQUEST);
 
         Optional<Account> optFrom = accountService.findAccount(
                 TypeCurrency.valueOf(fromCurrency.toUpperCase()), getCurrentUser().getUsername());
         Optional<Account> optTo = accountService.findAccountByNumber(toAccountNumber);
 
         if (optFrom.isEmpty() || optTo.isEmpty())
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("2", HttpStatus.BAD_REQUEST);
 
         Account from = optFrom.get();
         Account to = optTo.get();
 
         if (from.getBalance() < amount || from.getAccountNumber().equals(to.getAccountNumber()))
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("3", HttpStatus.BAD_REQUEST);
 
         double convertedAmount = amount;
         if (from.getCurrency() != to.getCurrency()) {
@@ -122,7 +130,23 @@ public class ClientController {
                 from.getBalance());
         accountService.updateBalance(to.getClient().getId(), to.getCurrency(), to.getBalance());
 
+        historyService.saveTransaction(from.getClient(), from.getAccountNumber(), from.getCurrency(),
+                to.getClient(), toAccountNumber, to.getCurrency(), LocalDateTime.now(), amount);
+
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/transactions")
+    public List<TransactionDTO> getTransacions(@RequestParam(defaultValue = "0") int page) {
+        return historyService.findByClientLogin(getCurrentUser().getUsername(),
+                PageRequest.of(page, 10, Sort.Direction.DESC, "id"));
+    }
+
+    @GetMapping("/transactions/pages")
+    public PageCountDTO pages() {
+        long transactions = historyService.count();
+        long pageCount = (transactions / 10) + ((transactions % 10 == 0) ? 0 : 1);
+        return PageCountDTO.of(pageCount, 10);
     }
 
     private User getCurrentUser() {
@@ -133,7 +157,7 @@ public class ClientController {
     }
 
     private boolean check(String currency) {
-        if (currency == null || currency.equalsIgnoreCase("UAH"))
+        if (currency == null)
             return true;
         try {
             TypeCurrency typeOfCurrency = TypeCurrency.valueOf(currency.toUpperCase());
