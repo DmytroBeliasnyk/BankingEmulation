@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.emuba.bankingemulation.dto.AccountDTO;
 import org.emuba.bankingemulation.enums.TypeCurrency;
+import org.emuba.bankingemulation.services.impl.AccountServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -41,11 +43,16 @@ public class Account {
         return AccountDTO.of(accountNumber, currency, balance);
     }
 
-    static class AccountNumberGenerator {
+    public class AccountNumberGenerator {
 
         private static final int ACCOUNT_NUMBER_LENGTH = 16;
         private static final Random random = new Random();
         private static final Set<String> generatedNumbers = new HashSet<>();
+        private final AccountServiceImpl accountService;
+
+        public AccountNumberGenerator(AccountServiceImpl accountService) {
+            this.accountService = accountService;
+        }
 
         public static String generateUniqueAccountNumber() {
             String accountNumber;
