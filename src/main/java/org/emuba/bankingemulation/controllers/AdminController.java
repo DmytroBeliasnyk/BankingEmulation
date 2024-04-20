@@ -3,18 +3,20 @@ package org.emuba.bankingemulation.controllers;
 import org.emuba.bankingemulation.dto.ClientDTO;
 import org.emuba.bankingemulation.dto.DataRequestDTO;
 import org.emuba.bankingemulation.dto.PageCountDTO;
+import org.emuba.bankingemulation.enums.DataType;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.models.Account;
 import org.emuba.bankingemulation.models.CustomClient;
 import org.emuba.bankingemulation.models.DataRequest;
-import org.emuba.bankingemulation.services.impl.AccountServiceImpl;
-import org.emuba.bankingemulation.services.impl.ClientServiceImpl;
-import org.emuba.bankingemulation.services.impl.DataRequestServiceImpl;
+import org.emuba.bankingemulation.services.impl.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -24,12 +26,16 @@ public class AdminController {
     private final ClientServiceImpl clientService;
     private final AccountServiceImpl accountService;
     private final DataRequestServiceImpl dataRequestService;
+    private final HistoryServiceImpl historyService;
+    private final MailService mailService;
     private final int PAGE_SIZE = 5;
 
-    public AdminController(ClientServiceImpl clientService, AccountServiceImpl accountService, DataRequestServiceImpl dataRequestService) {
+    public AdminController(ClientServiceImpl clientService, AccountServiceImpl accountService, DataRequestServiceImpl dataRequestService, HistoryServiceImpl historyService, MailService mailService) {
         this.clientService = clientService;
         this.accountService = accountService;
         this.dataRequestService = dataRequestService;
+        this.historyService = historyService;
+        this.mailService = mailService;
     }
 
     @GetMapping("clients")
@@ -66,4 +72,28 @@ public class AdminController {
         return dataRequestService.getAll();
     }
 
+    @GetMapping("send")
+    public ResponseEntity<Void> sendData(@RequestParam Long dataId) {
+        if (dataId == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        DataRequest request = dataRequestService.find(dataId);
+        CustomClient client = request.getClient();
+
+        if (request.getDataType() == DataType.ACCOUNT_BALANCE) {
+            StringBuilder sb = new StringBuilder();
+            for (var a : accountService.findAllByClient(client)) {
+                sb.append(a.toString())
+                        .append(System.lineSeparator());
+            }
+            mailService.sendEmail(client.getEmail(),
+                    DataType.ACCOUNT_BALANCE, sb.toString());
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            mailService.sendEmail(client.getEmail(),
+                    DataType.TRANSACTION_CONFIRMATION,
+                    historyService.find(dataId).toString());
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+    }
 }

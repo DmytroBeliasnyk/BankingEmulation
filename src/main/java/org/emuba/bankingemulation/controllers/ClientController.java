@@ -1,5 +1,6 @@
 package org.emuba.bankingemulation.controllers;
 
+import org.emuba.bankingemulation.configs.EmailUtils;
 import org.emuba.bankingemulation.dto.AccountDTO;
 import org.emuba.bankingemulation.dto.CurrencyRateDTO;
 import org.emuba.bankingemulation.dto.PageCountDTO;
@@ -57,9 +58,12 @@ public class ClientController {
                                          @RequestParam String login,
                                          @RequestParam String password) {
         if (name == null || surname == null || email == null ||
-                login == null || password == null) {
+                login == null || password == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+
+        if (!EmailUtils.isValidEmailAddress(email))
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
         List<String> logins = clientService.findAllLogins();
         for (var log : logins) {
             if (log.equals(login))
