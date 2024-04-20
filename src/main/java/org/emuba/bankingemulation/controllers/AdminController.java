@@ -1,12 +1,15 @@
 package org.emuba.bankingemulation.controllers;
 
 import org.emuba.bankingemulation.dto.ClientDTO;
+import org.emuba.bankingemulation.dto.DataRequestDTO;
 import org.emuba.bankingemulation.dto.PageCountDTO;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.models.Account;
 import org.emuba.bankingemulation.models.CustomClient;
+import org.emuba.bankingemulation.models.DataRequest;
 import org.emuba.bankingemulation.services.impl.AccountServiceImpl;
 import org.emuba.bankingemulation.services.impl.ClientServiceImpl;
+import org.emuba.bankingemulation.services.impl.DataRequestServiceImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -20,11 +23,13 @@ import java.util.List;
 public class AdminController {
     private final ClientServiceImpl clientService;
     private final AccountServiceImpl accountService;
+    private final DataRequestServiceImpl dataRequestService;
     private final int PAGE_SIZE = 5;
 
-    public AdminController(ClientServiceImpl clientService, AccountServiceImpl accountService) {
+    public AdminController(ClientServiceImpl clientService, AccountServiceImpl accountService, DataRequestServiceImpl dataRequestService) {
         this.clientService = clientService;
         this.accountService = accountService;
+        this.dataRequestService = dataRequestService;
     }
 
     @GetMapping("clients")
@@ -55,4 +60,10 @@ public class AdminController {
         accountService.updateBalance(clientId, TypeCurrency.UAH, account.getBalance());
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("confirmations")
+    public List<DataRequestDTO> getConfirmations() {
+        return dataRequestService.getAll();
+    }
+
 }
