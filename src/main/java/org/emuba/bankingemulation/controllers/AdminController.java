@@ -3,6 +3,7 @@ package org.emuba.bankingemulation.controllers;
 import org.emuba.bankingemulation.dto.ClientDTO;
 import org.emuba.bankingemulation.dto.DataRequestDTO;
 import org.emuba.bankingemulation.dto.PageCountDTO;
+import org.emuba.bankingemulation.enums.DataType;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.models.Account;
 import org.emuba.bankingemulation.models.CustomClient;
@@ -10,6 +11,7 @@ import org.emuba.bankingemulation.models.DataRequest;
 import org.emuba.bankingemulation.services.impl.AccountServiceImpl;
 import org.emuba.bankingemulation.services.impl.ClientServiceImpl;
 import org.emuba.bankingemulation.services.impl.DataRequestServiceImpl;
+import org.emuba.bankingemulation.services.impl.HistoryServiceImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -24,12 +26,14 @@ public class AdminController {
     private final ClientServiceImpl clientService;
     private final AccountServiceImpl accountService;
     private final DataRequestServiceImpl dataRequestService;
+    private final HistoryServiceImpl historyService;
     private final int PAGE_SIZE = 5;
 
-    public AdminController(ClientServiceImpl clientService, AccountServiceImpl accountService, DataRequestServiceImpl dataRequestService) {
+    public AdminController(ClientServiceImpl clientService, AccountServiceImpl accountService, DataRequestServiceImpl dataRequestService, HistoryServiceImpl historyService) {
         this.clientService = clientService;
         this.accountService = accountService;
         this.dataRequestService = dataRequestService;
+        this.historyService = historyService;
     }
 
     @GetMapping("clients")
@@ -66,4 +70,18 @@ public class AdminController {
         return dataRequestService.getAll();
     }
 
+    @GetMapping("send")
+    public ResponseEntity<?> sendData(@RequestParam Long dataId) {
+        if (dataId == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        DataRequest request = dataRequestService.find(dataId);
+
+        if (request.getDataType() == DataType.ACCOUNT_BALANCE) {
+            return new ResponseEntity<>(accountService.findAllByClient(request.getClient()),
+                    HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(historyService.find(dataId), HttpStatus.OK);
+        }
+    }
 }
