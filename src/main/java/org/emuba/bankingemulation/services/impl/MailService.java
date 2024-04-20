@@ -1,19 +1,13 @@
-package org.emuba.bankingemulation.mail;
+package org.emuba.bankingemulation.services.impl;
 
 import org.emuba.bankingemulation.enums.DataType;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
-@PropertySource("classpath:application.properties")
+@Service
 public class MailService {
     private final JavaMailSender sender;
-
-    @Value("${spring.mail.username}")
-    private String emailFrom;
 
     public MailService(JavaMailSender sender) {
         this.sender = sender;
@@ -23,7 +17,6 @@ public class MailService {
         SimpleMailMessage message = new SimpleMailMessage();
 
         message.setTo(email);
-        message.setFrom(emailFrom);
         message.setSubject(subject.name());
         message.setText(text);
 
