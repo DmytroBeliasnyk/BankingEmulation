@@ -4,14 +4,12 @@ import org.emuba.bankingemulation.dto.AccountDTO;
 import org.emuba.bankingemulation.dto.CurrencyRateDTO;
 import org.emuba.bankingemulation.dto.PageCountDTO;
 import org.emuba.bankingemulation.dto.TransactionDTO;
+import org.emuba.bankingemulation.enums.DataType;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.enums.UserRole;
 import org.emuba.bankingemulation.models.Account;
 import org.emuba.bankingemulation.retrievers.CurrencyRatesRetriever;
-import org.emuba.bankingemulation.services.impl.AccountServiceImpl;
-import org.emuba.bankingemulation.services.impl.ClientServiceImpl;
-import org.emuba.bankingemulation.services.impl.HistoryServiceImpl;
-import org.emuba.bankingemulation.services.impl.RateServiceImpl;
+import org.emuba.bankingemulation.services.impl.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -36,16 +34,18 @@ public class ClientController {
     private final AccountServiceImpl accountService;
     private final RateServiceImpl rateService;
     private final HistoryServiceImpl historyService;
+    private final DataRequestServiceImpl dataRequestService;
     private final CurrencyRatesRetriever retriever;
     private final PasswordEncoder encoder;
 
     public ClientController(ClientServiceImpl clientService, AccountServiceImpl accountService,
-                            RateServiceImpl rateService, HistoryServiceImpl historyService,
+                            RateServiceImpl rateService, HistoryServiceImpl historyService, DataRequestServiceImpl dataRequestService,
                             CurrencyRatesRetriever retriever, PasswordEncoder encoder) {
         this.clientService = clientService;
         this.accountService = accountService;
         this.rateService = rateService;
         this.historyService = historyService;
+        this.dataRequestService = dataRequestService;
         this.retriever = retriever;
         this.encoder = encoder;
     }
@@ -156,6 +156,24 @@ public class ClientController {
         long transactions = historyService.count();
         long pageCount = (transactions / 10) + ((transactions % 10 == 0) ? 0 : 1);
         return PageCountDTO.of(pageCount, 10);
+    }
+
+    @GetMapping("/transaction_confirmation")
+    public ResponseEntity<Void> getTransactionConfirmation(@RequestParam Long transactionId) {
+        if (transactionId == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        dataRequestService.add(getCurrentUser().getUsername(),
+                DataType.TRANSACTION_CONFIRMATION, transactionId);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/account_balance")
+    public ResponseEntity<Void> getAccountBalance() {
+        dataRequestService.add(getCurrentUser().getUsername(),
+                DataType.ACCOUNT_BALANCE, null);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private User getCurrentUser() {
