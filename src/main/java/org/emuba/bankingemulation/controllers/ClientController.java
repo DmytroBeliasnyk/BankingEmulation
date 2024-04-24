@@ -19,10 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -51,7 +48,7 @@ public class ClientController {
         this.encoder = encoder;
     }
 
-    @GetMapping("/register")
+    @PostMapping("/register")
     public ResponseEntity<Void> register(@RequestParam String name,
                                          @RequestParam String surname,
                                          @RequestParam String email,
@@ -79,7 +76,7 @@ public class ClientController {
 
     @GetMapping("/get_account")
     public ResponseEntity<AccountDTO> getAccount(@RequestParam String currency) {
-        if (check(currency) || currency.equalsIgnoreCase("uah"))
+        if (check(currency))
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         TypeCurrency typeOfCurrency = TypeCurrency.valueOf(currency.toUpperCase());
 
@@ -90,21 +87,21 @@ public class ClientController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
     }
 
-    @GetMapping("/add_account")
+    @PutMapping("/add_account")
     public ResponseEntity<Void> addAccount(@RequestParam String currency) {
-        if (check(currency))
+        if (check(currency) || currency.equalsIgnoreCase("uah"))
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         TypeCurrency typeOfCurrency = TypeCurrency.valueOf(currency.toUpperCase());
         accountService.addNewAccount(typeOfCurrency, getCurrentUser().getUsername());
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping("/do_transaction")
+    @PostMapping("/do_transaction")
     public ResponseEntity<Void> doTransaction(@RequestParam(name = "currency") String fromCurrency,
                                               @RequestParam(name = "account_number") String toAccountNumber,
-                                              @RequestParam(name = "amount") double amount) {
+                                              @RequestParam double amount) {
         if (fromCurrency == null || toAccountNumber == null
                 || amount < 5 || check(fromCurrency))
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -150,7 +147,8 @@ public class ClientController {
     }
 
     @GetMapping("/transactions")
-    public List<TransactionDTO> getTransacions(@RequestParam(defaultValue = "0") int page) {
+    public List<TransactionDTO> getTransacions(@RequestParam(required = false, defaultValue = "0")
+                                               int page) {
         return historyService.findByClientLogin(getCurrentUser().getUsername(),
                 PageRequest.of(page, 10, Sort.Direction.DESC, "id"));
     }

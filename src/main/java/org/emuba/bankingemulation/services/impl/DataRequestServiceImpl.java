@@ -36,8 +36,8 @@ public class DataRequestServiceImpl implements DataRequestService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<DataRequestDTO> getAll() {
-        return dataRepository.findAll()
+    public List<DataRequestDTO> getAll(Pageable pageable) {
+        return dataRepository.findAll(pageable)
                 .stream()
                 .map(DataRequest::toDTO)
                 .toList();
@@ -47,5 +47,11 @@ public class DataRequestServiceImpl implements DataRequestService {
     @Transactional(readOnly = true)
     public DataRequest find(Long id) {
         return dataRepository.findById(id).get();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long count() {
+        return dataRepository.count();
     }
 }

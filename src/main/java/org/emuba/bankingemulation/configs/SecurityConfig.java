@@ -17,22 +17,28 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    /*@Bean
+    @Bean
+    public CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler() {
+        return new CustomAuthenticationSuccessHandler();
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(login -> login
-                        .loginPage("/login").permitAll()
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/")
-                        .failureUrl("/login?error")
+//                        .loginPage("/login.html")
+//                        .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("/", false)
+                        .successHandler(customAuthenticationSuccessHandler())
+//                        .failureUrl("/login?error")
                         .usernameParameter("username")
                         .passwordParameter("password"))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/js/login.js").permitAll()
-                        .requestMatchers("/admin").hasRole("ADMIN")
+//                        .requestMatchers("/js/login.js").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated());
 
         return http.build();
-    }*/
+    }
 }

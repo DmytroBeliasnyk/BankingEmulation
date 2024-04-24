@@ -13,10 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,7 +27,9 @@ public class AdminController {
     private final MailService mailService;
     private final int PAGE_SIZE = 5;
 
-    public AdminController(ClientServiceImpl clientService, AccountServiceImpl accountService, DataRequestServiceImpl dataRequestService, HistoryServiceImpl historyService, MailService mailService) {
+    public AdminController(ClientServiceImpl clientService, AccountServiceImpl accountService,
+                           DataRequestServiceImpl dataRequestService, HistoryServiceImpl historyService,
+                           MailService mailService) {
         this.clientService = clientService;
         this.accountService = accountService;
         this.dataRequestService = dataRequestService;
@@ -53,7 +52,7 @@ public class AdminController {
         return PageCountDTO.of(pageCount, PAGE_SIZE);
     }
 
-    @GetMapping("add_money")
+    @PutMapping("add_money")
     public ResponseEntity<Void> addMoney(@RequestParam Long clientId,
                                          @RequestParam double amount) {
         if (amount <= 0)
@@ -68,8 +67,18 @@ public class AdminController {
     }
 
     @GetMapping("confirmations")
-    public List<DataRequestDTO> getConfirmations() {
-        return dataRequestService.getAll();
+    public List<DataRequestDTO> getConfirmations(@RequestParam(required = false, defaultValue = "0")
+                                                 int page) {
+        if (page < 0) page = 0;
+        return dataRequestService.getAll(PageRequest.of(page, PAGE_SIZE,
+                Sort.Direction.ASC, "id"));
+    }
+
+    @GetMapping("pages_confirmations")
+    public PageCountDTO pagesConfirmations() {
+        long count = dataRequestService.count();
+        long pageCount = (count / PAGE_SIZE) + ((count % PAGE_SIZE == 0) ? 0 : 1);
+        return PageCountDTO.of(pageCount, PAGE_SIZE);
     }
 
     @GetMapping("send")

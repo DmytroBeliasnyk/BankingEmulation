@@ -6,6 +6,7 @@ import org.emuba.bankingemulation.models.Account;
 import org.emuba.bankingemulation.models.CustomClient;
 import org.emuba.bankingemulation.repositories.AccountRepository;
 import org.emuba.bankingemulation.services.AccountService;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
