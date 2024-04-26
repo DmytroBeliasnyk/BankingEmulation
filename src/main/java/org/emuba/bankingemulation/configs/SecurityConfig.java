@@ -28,7 +28,6 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(login -> login
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/", false)
                         .successHandler(customAuthenticationSuccessHandler())
                         .usernameParameter("username")
                         .passwordParameter("password"))
