@@ -1,18 +1,16 @@
 package org.emuba.bankingemulation.controllers;
 
-import org.emuba.bankingemulation.configs.EmailUtils;
 import org.emuba.bankingemulation.dto.AccountDTO;
 import org.emuba.bankingemulation.dto.CurrencyRateDTO;
 import org.emuba.bankingemulation.dto.PageCountDTO;
 import org.emuba.bankingemulation.dto.TransactionDTO;
 import org.emuba.bankingemulation.enums.DataType;
 import org.emuba.bankingemulation.enums.TypeCurrency;
-import org.emuba.bankingemulation.enums.UserRole;
 import org.emuba.bankingemulation.models.Account;
+import org.emuba.bankingemulation.models.CustomClient;
 import org.emuba.bankingemulation.retrievers.CurrencyRatesRetriever;
 import org.emuba.bankingemulation.services.impl.*;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/client")
 public class ClientController {
     private final ClientServiceImpl clientService;
     private final AccountServiceImpl accountService;
@@ -48,76 +47,44 @@ public class ClientController {
         this.encoder = encoder;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestParam String name,
-                                         @RequestParam String surname,
-                                         @RequestParam String email,
-                                         @RequestParam String login,
-                                         @RequestParam String password) {
-        if (name == null || surname == null || email == null ||
-                login == null || password == null)
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-        if (!EmailUtils.isValidEmailAddress(email))
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-        List<String> logins = clientService.findAllLogins();
-        for (var log : logins) {
-            if (log.equals(login))
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        String passHash = encoder.encode(password);
-
-        clientService.addClient(name, surname, email,
-                login, passHash, UserRole.USER);
-
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    @GetMapping("/get_account")
-    public ResponseEntity<AccountDTO> getAccount(@RequestParam String currency) {
+    @GetMapping("get_account")
+    public ResponseEntity<?> getAccount(@RequestParam String currency) {
         if (check(currency))
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Unsupported currency", HttpStatus.BAD_REQUEST);
         TypeCurrency typeOfCurrency = TypeCurrency.valueOf(currency.toUpperCase());
 
         Optional<Account> accountOpt = accountService.findAccount(
                 typeOfCurrency, getCurrentUser().getUsername());
 
-        return accountOpt.map(account -> new ResponseEntity<>(account.toDTO(), HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+        if (accountOpt.isEmpty())
+            new ResponseEntity<>("Account was not created", HttpStatus.BAD_REQUEST);
+
+        return new ResponseEntity<>(accountOpt.map(Account::toDTO).get(), HttpStatus.OK);
     }
 
-    @PutMapping("/add_account")
-    public ResponseEntity<Void> addAccount(@RequestParam String currency) {
-        if (check(currency) || currency.equalsIgnoreCase("uah"))
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-        TypeCurrency typeOfCurrency = TypeCurrency.valueOf(currency.toUpperCase());
-        accountService.addNewAccount(typeOfCurrency, getCurrentUser().getUsername());
-
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    @GetMapping("accounts_list")
+    public List<AccountDTO> getAllAccounts() {
+        CustomClient client = clientService.findClientByLogin(getCurrentUser().getUsername());
+        return accountService.findAllByClient(client);
     }
 
-    @PostMapping("/do_transaction")
-    public ResponseEntity<Void> doTransaction(@RequestParam(name = "currency") String fromCurrency,
-                                              @RequestParam(name = "account_number") String toAccountNumber,
-                                              @RequestParam double amount) {
-        if (fromCurrency == null || toAccountNumber == null
-                || amount < 5 || check(fromCurrency))
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    @PostMapping("do_transaction")
+    public ResponseEntity<String> doTransaction(@RequestBody AccountDTO fromAccount,
+                                                @RequestParam(name = "to_account") String toAccountNumber,
+                                                @RequestParam double amount) {
 
-        Optional<Account> optFrom = accountService.findAccount(
-                TypeCurrency.valueOf(fromCurrency.toUpperCase()), getCurrentUser().getUsername());
+
+        Optional<Account> optFrom = accountService.findAccountByNumber(fromAccount.getAccountNumber());
         Optional<Account> optTo = accountService.findAccountByNumber(toAccountNumber);
 
-        if (optFrom.isEmpty() || optTo.isEmpty())
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (optTo.isEmpty() || optFrom.isEmpty())
+            return new ResponseEntity<>("The account number was not found", HttpStatus.BAD_REQUEST);
 
         Account from = optFrom.get();
         Account to = optTo.get();
 
         if (from.getBalance() < amount || from.getAccountNumber().equals(to.getAccountNumber()))
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Negative amount", HttpStatus.BAD_REQUEST);
 
         double convertedAmount = amount;
         if (from.getCurrency() != to.getCurrency()) {
@@ -128,54 +95,64 @@ public class ClientController {
         from.setBalance(from.getBalance() - amount);
         to.setBalance(to.getBalance() + convertedAmount);
 
-        accountService.updateBalance(from.getClient().getId(), TypeCurrency.valueOf(fromCurrency.toUpperCase()),
-                from.getBalance());
+        accountService.updateBalance(from.getClient().getId(), from.getCurrency(), from.getBalance());
         accountService.updateBalance(to.getClient().getId(), to.getCurrency(), to.getBalance());
 
         historyService.saveTransaction(from.getClient(), from.getAccountNumber(), from.getCurrency(),
                 to.getClient(), toAccountNumber, to.getCurrency(), LocalDateTime.now(), amount);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>("Success", HttpStatus.OK);
     }
 
-    @PostMapping("/confirm")
-    public ResponseEntity<Void> confirm(@RequestParam String password) {
+    @PutMapping("add_account")
+    public ResponseEntity<String> addAccount(@RequestParam String currency) {
+        if (check(currency))
+            return new ResponseEntity<>("Unsupported currency", HttpStatus.BAD_REQUEST);
+
+        TypeCurrency typeOfCurrency = TypeCurrency.valueOf(currency.toUpperCase());
+        accountService.addNewAccount(typeOfCurrency, getCurrentUser().getUsername());
+
+        return new ResponseEntity<>("Success", HttpStatus.CREATED);
+    }
+
+    @PostMapping("confirm")
+    public ResponseEntity<String> confirm(@RequestParam String password) {
         if (encoder.encode(password).equals(getCurrentUser().getPassword()))
             return new ResponseEntity<>(HttpStatus.OK);
         else
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Invalid password", HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping("/transactions")
-    public List<TransactionDTO> getTransacions(@RequestParam(required = false, defaultValue = "0")
-                                               int page) {
+    @GetMapping("transactions")
+    public List<TransactionDTO> getTransactions(@RequestParam(required = false, defaultValue = "0")
+                                                int page) {
         return historyService.findByClientLogin(getCurrentUser().getUsername(),
                 PageRequest.of(page, 10, Sort.Direction.DESC, "id"));
     }
 
-    @GetMapping("/transactions/pages")
+    @GetMapping("pages_transactions")
     public PageCountDTO pages() {
         long transactions = historyService.count();
         long pageCount = (transactions / 10) + ((transactions % 10 == 0) ? 0 : 1);
         return PageCountDTO.of(pageCount, 10);
     }
 
-    @GetMapping("/transaction_confirmation")
-    public ResponseEntity<Void> getTransactionConfirmation(@RequestParam Long transactionId) {
+    @GetMapping("transaction_confirmation")
+    public ResponseEntity<String> getTransactionConfirmation(@RequestParam Long transactionId) {
         if (transactionId == null)
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Not Selected", HttpStatus.BAD_REQUEST);
 
         dataRequestService.add(getCurrentUser().getUsername(),
                 DataType.TRANSACTION_CONFIRMATION, transactionId);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>("Success", HttpStatus.OK);
     }
 
-    @GetMapping("/account_balance")
-    public ResponseEntity<Void> getAccountBalance() {
+    @GetMapping("account_balance")
+    public ResponseEntity<String> getAccountBalance() {
         dataRequestService.add(getCurrentUser().getUsername(),
                 DataType.ACCOUNT_BALANCE, null);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>("Success", HttpStatus.OK);
     }
 
     private User getCurrentUser() {

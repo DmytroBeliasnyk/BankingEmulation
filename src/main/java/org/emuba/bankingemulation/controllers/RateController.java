@@ -6,12 +6,14 @@ import org.emuba.bankingemulation.services.impl.RateServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 
 @RestController
+@RequestMapping("/rate")
 public class RateController {
     private final CurrencyRatesRetriever retriever;
     private final RateServiceImpl rateService;
@@ -21,7 +23,7 @@ public class RateController {
         this.rateService = rateService;
     }
 
-    @GetMapping("/rate")
+    @GetMapping("get")
     public ResponseEntity<CurrencyRateDTO> getRate(@RequestParam String currency) {
         LocalDate date = LocalDate.now();
         CurrencyRateDTO rate = rateService.find(currency, date);

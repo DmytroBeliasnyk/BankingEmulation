@@ -59,14 +59,8 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional(readOnly = true)
-    public long findClientId(String login) {
-        return clientRepository.findByLogin(login).getId();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<String> findAllLogins() {
-        return clientRepository.findAllLogins();
+    public boolean existsByLogin(String login) {
+        return clientRepository.existsByLogin(login);
     }
 
     @Override

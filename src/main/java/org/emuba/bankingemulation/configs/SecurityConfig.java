@@ -27,17 +27,15 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(login -> login
-//                        .loginPage("/login.html")
-//                        .loginProcessingUrl("/login")
+                        .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/", false)
                         .successHandler(customAuthenticationSuccessHandler())
-//                        .failureUrl("/login?error")
                         .usernameParameter("username")
                         .passwordParameter("password"))
                 .authorizeHttpRequests(authorize -> authorize
-//                        .requestMatchers("/js/login.js").permitAll()
+                        .requestMatchers("/client/**", "/rate/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated());
+                        .anyRequest().permitAll());
 
         return http.build();
     }

@@ -53,17 +53,18 @@ public class AdminController {
     }
 
     @PutMapping("add_money")
-    public ResponseEntity<Void> addMoney(@RequestParam Long clientId,
-                                         @RequestParam double amount) {
+    public ResponseEntity<String> addMoney(@RequestParam Long clientId,
+                                           @RequestParam double amount) {
         if (amount <= 0)
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Negative value", HttpStatus.BAD_REQUEST);
+
         CustomClient client = clientService.findById(clientId);
         Account account = accountService.
                 findAccount(TypeCurrency.UAH, client.getLogin()).get();
         account.setBalance(account.getBalance() + amount);
 
         accountService.updateBalance(clientId, TypeCurrency.UAH, account.getBalance());
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>("Success", HttpStatus.OK);
     }
 
     @GetMapping("confirmations")
@@ -82,9 +83,9 @@ public class AdminController {
     }
 
     @GetMapping("send")
-    public ResponseEntity<Void> sendData(@RequestParam Long dataId) {
+    public ResponseEntity<String> sendData(@RequestParam Long dataId) {
         if (dataId == null)
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Not Selected", HttpStatus.BAD_REQUEST);
 
         DataRequest request = dataRequestService.find(dataId);
         CustomClient client = request.getClient();
@@ -97,12 +98,12 @@ public class AdminController {
             }
             mailService.sendEmail(client.getEmail(),
                     DataType.ACCOUNT_BALANCE, sb.toString());
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>("Success", HttpStatus.OK);
         } else {
             mailService.sendEmail(client.getEmail(),
                     DataType.TRANSACTION_CONFIRMATION,
                     historyService.find(dataId).toString());
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>("Success", HttpStatus.OK);
         }
     }
 }

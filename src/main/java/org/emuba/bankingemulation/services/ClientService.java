@@ -18,9 +18,7 @@ public interface ClientService {
 
     CustomClient findClientByLogin(String login);
 
-    long findClientId(String login);
-
-    List<String> findAllLogins();
+    boolean existsByLogin(String login);
 
     long countClients();
 }
