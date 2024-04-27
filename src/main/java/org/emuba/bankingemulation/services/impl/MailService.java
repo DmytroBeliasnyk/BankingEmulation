@@ -1,6 +1,6 @@
 package org.emuba.bankingemulation.services.impl;
 
-import org.emuba.bankingemulation.enums.DataType;
+import org.emuba.bankingemulation.enums.ClientRequestType;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ public class MailService {
         this.sender = sender;
     }
 
-    public void sendEmail(String email, DataType subject, String text) {
+    public void sendEmail(String email, ClientRequestType subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
 
         message.setTo(email);

@@ -2,9 +2,9 @@ package org.emuba.bankingemulation.controllers;
 
 import org.emuba.bankingemulation.configs.EmailUtils;
 import org.emuba.bankingemulation.configs.security.JWTGenerator;
-import org.emuba.bankingemulation.dto.LoginDTO;
-import org.emuba.bankingemulation.dto.RegisterDTO;
-import org.emuba.bankingemulation.dto.TokenDTO;
+import org.emuba.bankingemulation.dto.auth.LoginDTO;
+import org.emuba.bankingemulation.dto.auth.RegisterDTO;
+import org.emuba.bankingemulation.dto.auth.TokenDTO;
 import org.emuba.bankingemulation.enums.UserRole;
 import org.emuba.bankingemulation.services.impl.ClientServiceImpl;
 import org.springframework.http.HttpStatus;

@@ -4,7 +4,7 @@ import org.emuba.bankingemulation.dto.AccountDTO;
 import org.emuba.bankingemulation.dto.CurrencyRateDTO;
 import org.emuba.bankingemulation.dto.PageCountDTO;
 import org.emuba.bankingemulation.dto.TransactionDTO;
-import org.emuba.bankingemulation.enums.DataType;
+import org.emuba.bankingemulation.enums.ClientRequestType;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.models.Account;
 import org.emuba.bankingemulation.models.CustomClient;
@@ -31,12 +31,12 @@ public class ClientController {
     private final AccountServiceImpl accountService;
     private final RateServiceImpl rateService;
     private final HistoryServiceImpl historyService;
-    private final DataRequestServiceImpl dataRequestService;
+    private final ClientRequestServiceImpl dataRequestService;
     private final CurrencyRatesRetriever retriever;
     private final PasswordEncoder encoder;
 
     public ClientController(ClientServiceImpl clientService, AccountServiceImpl accountService,
-                            RateServiceImpl rateService, HistoryServiceImpl historyService, DataRequestServiceImpl dataRequestService,
+                            RateServiceImpl rateService, HistoryServiceImpl historyService, ClientRequestServiceImpl dataRequestService,
                             CurrencyRatesRetriever retriever, PasswordEncoder encoder) {
         this.clientService = clientService;
         this.accountService = accountService;
@@ -143,7 +143,7 @@ public class ClientController {
             return new ResponseEntity<>("Not Selected", HttpStatus.BAD_REQUEST);
 
         dataRequestService.add(getCurrentUser().getUsername(),
-                DataType.TRANSACTION_CONFIRMATION, transactionId);
+                ClientRequestType.TRANSACTION_CONFIRMATION, transactionId);
 
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }
@@ -151,7 +151,7 @@ public class ClientController {
     @GetMapping("account_balance")
     public ResponseEntity<String> getAccountBalance() {
         dataRequestService.add(getCurrentUser().getUsername(),
-                DataType.ACCOUNT_BALANCE, null);
+                ClientRequestType.ACCOUNT_BALANCE, null);
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }
 

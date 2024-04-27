@@ -1,4 +1,4 @@
-package org.emuba.bankingemulation.dto;
+package org.emuba.bankingemulation.dto.auth;
 
 import lombok.Data;
 
