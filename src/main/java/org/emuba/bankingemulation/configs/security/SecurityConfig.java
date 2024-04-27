@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/client/**", "/rate/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().permitAll())
+                        .requestMatchers("/login").permitAll())
                 .httpBasic(Customizer.withDefaults());
 
         http.addFilterBefore(jwtAuthenticationFilter(),
