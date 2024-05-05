@@ -67,11 +67,4 @@ public class AuthController {
 
         return new ResponseEntity<>(new TokenDTO(token), HttpStatus.OK);
     }
-    @GetMapping("/")
-    public List<ClientDTO> getUsers(@RequestParam(required = false, defaultValue = "0")
-                                    int page) {
-        if (page < 0) page = 0;
-        return clientService.findAllClients(PageRequest.of(page, 5,
-                Sort.Direction.ASC, "id"));
-    }
 }
