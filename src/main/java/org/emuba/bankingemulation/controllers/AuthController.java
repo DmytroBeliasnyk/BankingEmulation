@@ -2,11 +2,14 @@ package org.emuba.bankingemulation.controllers;
 
 import org.emuba.bankingemulation.configs.EmailUtils;
 import org.emuba.bankingemulation.configs.security.JWTGenerator;
+import org.emuba.bankingemulation.dto.ClientDTO;
 import org.emuba.bankingemulation.dto.auth.LoginDTO;
 import org.emuba.bankingemulation.dto.auth.RegisterDTO;
 import org.emuba.bankingemulation.dto.auth.TokenDTO;
 import org.emuba.bankingemulation.enums.UserRole;
 import org.emuba.bankingemulation.services.impl.ClientServiceImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,10 +17,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class AuthController {
@@ -64,5 +66,12 @@ public class AuthController {
         String token = jwtGenerator.generateToken(authentication);
 
         return new ResponseEntity<>(new TokenDTO(token), HttpStatus.OK);
+    }
+    @GetMapping("/")
+    public List<ClientDTO> getUsers(@RequestParam(required = false, defaultValue = "0")
+                                    int page) {
+        if (page < 0) page = 0;
+        return clientService.findAllClients(PageRequest.of(page, 5,
+                Sort.Direction.ASC, "id"));
     }
 }
