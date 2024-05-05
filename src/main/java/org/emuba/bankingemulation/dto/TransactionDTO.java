@@ -31,6 +31,7 @@ public class TransactionDTO {
         this.toName = toName;
         this.toAccount = toAccount;
         this.toCurrency = toCurrency;
+        this.date = date;
         this.amount = amount;
     }
 

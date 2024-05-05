@@ -1,13 +1,13 @@
 package org.emuba.bankingemulation.controllers;
 
 import org.emuba.bankingemulation.dto.ClientDTO;
-import org.emuba.bankingemulation.dto.DataRequestDTO;
+import org.emuba.bankingemulation.dto.ClientRequestDTO;
 import org.emuba.bankingemulation.dto.PageCountDTO;
-import org.emuba.bankingemulation.enums.DataType;
+import org.emuba.bankingemulation.enums.ClientRequestType;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.models.Account;
 import org.emuba.bankingemulation.models.CustomClient;
-import org.emuba.bankingemulation.models.DataRequest;
+import org.emuba.bankingemulation.models.ClientRequest;
 import org.emuba.bankingemulation.services.impl.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,13 +22,13 @@ import java.util.List;
 public class AdminController {
     private final ClientServiceImpl clientService;
     private final AccountServiceImpl accountService;
-    private final DataRequestServiceImpl dataRequestService;
+    private final ClientRequestServiceImpl dataRequestService;
     private final HistoryServiceImpl historyService;
     private final MailService mailService;
     private final int PAGE_SIZE = 5;
 
     public AdminController(ClientServiceImpl clientService, AccountServiceImpl accountService,
-                           DataRequestServiceImpl dataRequestService, HistoryServiceImpl historyService,
+                           ClientRequestServiceImpl dataRequestService, HistoryServiceImpl historyService,
                            MailService mailService) {
         this.clientService = clientService;
         this.accountService = accountService;
@@ -68,7 +68,7 @@ public class AdminController {
     }
 
     @GetMapping("confirmations")
-    public List<DataRequestDTO> getConfirmations(@RequestParam(required = false, defaultValue = "0")
+    public List<ClientRequestDTO> getConfirmations(@RequestParam(required = false, defaultValue = "0")
                                                  int page) {
         if (page < 0) page = 0;
         return dataRequestService.getAll(PageRequest.of(page, PAGE_SIZE,
@@ -87,21 +87,21 @@ public class AdminController {
         if (dataId == null)
             return new ResponseEntity<>("Not Selected", HttpStatus.BAD_REQUEST);
 
-        DataRequest request = dataRequestService.find(dataId);
+        ClientRequest request = dataRequestService.find(dataId);
         CustomClient client = request.getClient();
 
-        if (request.getDataType() == DataType.ACCOUNT_BALANCE) {
+        if (request.getClientRequestType() == ClientRequestType.ACCOUNT_BALANCE) {
             StringBuilder sb = new StringBuilder();
             for (var a : accountService.findAllByClient(client)) {
                 sb.append(a.toString())
                         .append(System.lineSeparator());
             }
             mailService.sendEmail(client.getEmail(),
-                    DataType.ACCOUNT_BALANCE, sb.toString());
+                    ClientRequestType.ACCOUNT_BALANCE, sb.toString());
             return new ResponseEntity<>("Success", HttpStatus.OK);
         } else {
             mailService.sendEmail(client.getEmail(),
-                    DataType.TRANSACTION_CONFIRMATION,
+                    ClientRequestType.TRANSACTION_CONFIRMATION,
                     historyService.find(dataId).toString());
             return new ResponseEntity<>("Success", HttpStatus.OK);
         }
