@@ -33,18 +33,16 @@ public class ClientController {
     private final HistoryServiceImpl historyService;
     private final ClientRequestServiceImpl dataRequestService;
     private final CurrencyRatesRetriever retriever;
-    private final PasswordEncoder encoder;
 
     public ClientController(ClientServiceImpl clientService, AccountServiceImpl accountService,
                             RateServiceImpl rateService, HistoryServiceImpl historyService, ClientRequestServiceImpl dataRequestService,
-                            CurrencyRatesRetriever retriever, PasswordEncoder encoder) {
+                            CurrencyRatesRetriever retriever) {
         this.clientService = clientService;
         this.accountService = accountService;
         this.rateService = rateService;
         this.historyService = historyService;
         this.dataRequestService = dataRequestService;
         this.retriever = retriever;
-        this.encoder = encoder;
     }
 
     @GetMapping("get_account")

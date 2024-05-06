@@ -9,4 +9,6 @@ public interface RateService {
     void save(CurrencyRate rate);
 
     CurrencyRateDTO find(String currency, LocalDate date);
+
+    void deleteNonActualRates();
 }
