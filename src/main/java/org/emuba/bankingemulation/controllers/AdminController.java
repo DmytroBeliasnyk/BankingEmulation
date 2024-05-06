@@ -69,7 +69,7 @@ public class AdminController {
 
     @GetMapping("confirmations")
     public List<ClientRequestDTO> getConfirmations(@RequestParam(required = false, defaultValue = "0")
-                                                 int page) {
+                                                   int page) {
         if (page < 0) page = 0;
         return dataRequestService.getAll(PageRequest.of(page, PAGE_SIZE,
                 Sort.Direction.ASC, "id"));
@@ -98,12 +98,13 @@ public class AdminController {
             }
             mailService.sendEmail(client.getEmail(),
                     ClientRequestType.ACCOUNT_BALANCE, sb.toString());
-            return new ResponseEntity<>("Success", HttpStatus.OK);
         } else {
             mailService.sendEmail(client.getEmail(),
                     ClientRequestType.TRANSACTION_CONFIRMATION,
                     historyService.find(dataId).toString());
-            return new ResponseEntity<>("Success", HttpStatus.OK);
         }
+        dataRequestService.delete(request.getId());
+
+        return new ResponseEntity<>("Success", HttpStatus.OK);
     }
 }
