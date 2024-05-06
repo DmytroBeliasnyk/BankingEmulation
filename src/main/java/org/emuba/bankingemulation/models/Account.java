@@ -29,40 +29,16 @@ public class Account {
 
     private double balance;
 
-    private Account(TypeCurrency currency) {
+    private Account(String accountNumber, TypeCurrency currency) {
+        this.accountNumber = accountNumber;
         this.currency = currency;
     }
 
-    public static Account of(TypeCurrency currency) {
-        Account Account = new Account(currency);
-        Account.setAccountNumber(AccountNumberGenerator.generateUniqueAccountNumber());
-        return Account;
+    public static Account of(String accountNumber, TypeCurrency currency) {
+        return new Account(accountNumber, currency);
     }
 
     public AccountDTO toDTO() {
         return AccountDTO.of(accountNumber, currency, balance);
-    }
-
-    public static class AccountNumberGenerator {
-
-        private static final int ACCOUNT_NUMBER_LENGTH = 16;
-        private static final Random random = new Random();
-        private static final Set<String> generatedNumbers = new HashSet<>();
-
-        public static String generateUniqueAccountNumber() {
-            String accountNumber;
-            do {
-                accountNumber = generateRandomAccountNumber();
-            } while (!generatedNumbers.add(accountNumber));
-            return accountNumber;
-        }
-
-        private static String generateRandomAccountNumber() {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < ACCOUNT_NUMBER_LENGTH; i++) {
-                sb.append(random.nextInt(10));
-            }
-            return sb.toString();
-        }
     }
 }

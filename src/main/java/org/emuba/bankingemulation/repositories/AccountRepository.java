@@ -20,4 +20,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     void updateBalance(Long clientId, TypeCurrency currency, double newBalance);
 
     List<Account> findAllByClient(CustomClient client);
+
+    Boolean existsByAccountNumber(String accountNumber);
 }

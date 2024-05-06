@@ -18,9 +18,12 @@ import java.util.stream.Collectors;
 @Service
 public class ClientServiceImpl implements ClientService {
     private final ClientRepository clientRepository;
+    private final AccountNumberGenerator numberGenerator;
 
-    public ClientServiceImpl(ClientRepository clientRepository) {
+    public ClientServiceImpl(ClientRepository clientRepository,
+                             AccountNumberGenerator numberGenerator) {
         this.clientRepository = clientRepository;
+        this.numberGenerator = numberGenerator;
     }
 
     @Override
@@ -29,7 +32,8 @@ public class ClientServiceImpl implements ClientService {
                           String login, String passHash, UserRole role) {
         CustomClient client = CustomClient.of(name, surname, email, login, passHash, role);
         if (role != UserRole.ADMIN)
-            client.addAccount(Account.of(TypeCurrency.UAH));
+            client.addAccount(Account.of(numberGenerator.generateUniqueAccountNumber(),
+                    TypeCurrency.UAH));
         clientRepository.save(client);
     }
 

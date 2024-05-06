@@ -17,11 +17,14 @@ import java.util.Optional;
 public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final ClientServiceImpl clientService;
+    private final AccountNumberGenerator numberGenerator;
 
     public AccountServiceImpl(AccountRepository accountRepository,
-                              ClientServiceImpl clientService) {
+                              ClientServiceImpl clientService,
+                              AccountNumberGenerator numberGenerator) {
         this.accountRepository = accountRepository;
         this.clientService = clientService;
+        this.numberGenerator = numberGenerator;
     }
 
     @Override
@@ -30,8 +33,11 @@ public class AccountServiceImpl implements AccountService {
         if (findAccount(currency, login).isPresent())
             return;
         CustomClient client = clientService.findClientByLogin(login);
-        Account newAccount = Account.of(currency);
+
+        Account newAccount = Account.of(numberGenerator.generateUniqueAccountNumber(),
+                currency);
         client.addAccount(newAccount);
+
         accountRepository.save(newAccount);
     }
 

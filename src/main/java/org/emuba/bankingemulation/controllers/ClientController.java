@@ -115,14 +115,6 @@ public class ClientController {
         return new ResponseEntity<>("Success", HttpStatus.CREATED);
     }
 
-    @PostMapping("confirm")
-    public ResponseEntity<String> confirm(@RequestParam String password) {
-        if (encoder.encode(password).equals(getCurrentUser().getPassword()))
-            return new ResponseEntity<>(HttpStatus.OK);
-        else
-            return new ResponseEntity<>("Invalid password", HttpStatus.BAD_REQUEST);
-    }
-
     @GetMapping("transactions")
     public List<TransactionDTO> getTransactions(@RequestParam(required = false, defaultValue = "0")
                                                 int page) {
