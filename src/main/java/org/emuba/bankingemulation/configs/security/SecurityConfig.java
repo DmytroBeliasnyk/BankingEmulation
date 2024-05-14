@@ -36,10 +36,6 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                /*.headers(configurer -> configurer
-                        .contentSecurityPolicy(contentSecurityPolicyConfig ->
-                                contentSecurityPolicyConfig.policyDirectives(
-                                        "default-src *;")))*/
                 .exceptionHandling(handling -> handling
                         .authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(management -> management
