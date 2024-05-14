@@ -10,6 +10,7 @@ import org.emuba.bankingemulation.services.impl.ClientServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -61,8 +62,8 @@ public class AuthController {
                             loginDTO.getUsername(),
                             loginDTO.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Invalid login or password" + e, HttpStatus.BAD_REQUEST);
+        } catch (BadCredentialsException e) {
+            return new ResponseEntity<>("Invalid login or password", HttpStatus.BAD_REQUEST);
         }
         String token = jwtGenerator.generateToken(authentication);
 
