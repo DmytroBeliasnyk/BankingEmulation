@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .headers(configurer->configurer
                         .contentSecurityPolicy(contentSecurityPolicyConfig ->
                                 contentSecurityPolicyConfig.policyDirectives(
-                                        "default-src '*';")))
+                                        "default-src 'self';")))
                 .exceptionHandling(handling -> handling
                         .authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(management -> management
