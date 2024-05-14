@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .headers(configurer -> configurer
                         .contentSecurityPolicy(contentSecurityPolicyConfig ->
                                 contentSecurityPolicyConfig.policyDirectives(
-                                        "script-src 'self';")))
+                                        "script-src 'self' *;")))
                 .exceptionHandling(handling -> handling
                         .authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(management -> management
