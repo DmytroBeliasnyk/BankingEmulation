@@ -2,14 +2,11 @@ package org.emuba.bankingemulation.controllers;
 
 import org.emuba.bankingemulation.configs.EmailUtils;
 import org.emuba.bankingemulation.configs.security.JWTGenerator;
-import org.emuba.bankingemulation.dto.ClientDTO;
 import org.emuba.bankingemulation.dto.auth.LoginDTO;
 import org.emuba.bankingemulation.dto.auth.RegisterDTO;
 import org.emuba.bankingemulation.dto.auth.TokenDTO;
 import org.emuba.bankingemulation.enums.UserRole;
 import org.emuba.bankingemulation.services.impl.ClientServiceImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,9 +14,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class AuthController {
@@ -56,13 +53,17 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDTO> login(@RequestBody LoginDTO loginDTO) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginDTO.getUsername(),
-                        loginDTO.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
+    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginDTO.getUsername(),
+                            loginDTO.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Invalid login or password" + e, HttpStatus.BAD_REQUEST);
+        }
         String token = jwtGenerator.generateToken(authentication);
 
         return new ResponseEntity<>(new TokenDTO(token), HttpStatus.OK);
