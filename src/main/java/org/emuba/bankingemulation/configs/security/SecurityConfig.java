@@ -36,10 +36,10 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .headers(configurer -> configurer
+                /*.headers(configurer -> configurer
                         .contentSecurityPolicy(contentSecurityPolicyConfig ->
                                 contentSecurityPolicyConfig.policyDirectives(
-                                        "default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src *; media-src *; font-src *; connect-src *;")))
+                                        "default-src *;")))*/
                 .exceptionHandling(handling -> handling
                         .authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(management -> management

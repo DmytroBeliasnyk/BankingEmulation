@@ -9,12 +9,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.net.URISyntaxException;
 import java.util.Properties;
 
 @Configuration
-public class AppConfig {
+@EnableWebMvc
+public class AppConfig implements WebMvcConfigurer {
     @Bean
     public CommandLineRunner commandLineRunner(final ClientServiceImpl clientService,
                                                final PasswordEncoder encoder) {
@@ -27,6 +31,11 @@ public class AppConfig {
                         "user", encoder.encode("user"), UserRole.USER);
             }
         };
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**");
     }
 
     @Bean
