@@ -1,7 +1,6 @@
 package org.emuba.bankingemulation.controllers;
 
 import org.emuba.bankingemulation.dto.AccountDTO;
-import org.emuba.bankingemulation.dto.CurrencyRateDTO;
 import org.emuba.bankingemulation.dto.PageCountDTO;
 import org.emuba.bankingemulation.dto.TransactionDTO;
 import org.emuba.bankingemulation.enums.ClientRequestType;
@@ -9,7 +8,10 @@ import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.models.Account;
 import org.emuba.bankingemulation.models.CustomClient;
 import org.emuba.bankingemulation.retrievers.CurrencyRatesRetriever;
-import org.emuba.bankingemulation.services.impl.*;
+import org.emuba.bankingemulation.services.impl.AccountServiceImpl;
+import org.emuba.bankingemulation.services.impl.ClientRequestServiceImpl;
+import org.emuba.bankingemulation.services.impl.ClientServiceImpl;
+import org.emuba.bankingemulation.services.impl.HistoryServiceImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -28,17 +30,15 @@ import java.util.Optional;
 public class ClientController {
     private final ClientServiceImpl clientService;
     private final AccountServiceImpl accountService;
-    private final RateServiceImpl rateService;
     private final HistoryServiceImpl historyService;
     private final ClientRequestServiceImpl dataRequestService;
     private final CurrencyRatesRetriever retriever;
 
     public ClientController(ClientServiceImpl clientService, AccountServiceImpl accountService,
-                            RateServiceImpl rateService, HistoryServiceImpl historyService, ClientRequestServiceImpl dataRequestService,
+                            HistoryServiceImpl historyService, ClientRequestServiceImpl dataRequestService,
                             CurrencyRatesRetriever retriever) {
         this.clientService = clientService;
         this.accountService = accountService;
-        this.rateService = rateService;
         this.historyService = historyService;
         this.dataRequestService = dataRequestService;
         this.retriever = retriever;
@@ -167,16 +167,12 @@ public class ClientController {
         double rateFromUAH = 1;
 
         if (!fromCurrency.equals("UAH")) {
-            CurrencyRateDTO rate = rateService.find(fromCurrency);
-            if (rate == null)
-                rate = retriever.getRate(fromCurrency, LocalDate.now());
-            rateToUAH = rate.getRate();
+            rateToUAH = retriever.getRate(fromCurrency, LocalDate.now())
+                    .getRate();
         }
         if (!toCurrency.equals("UAH")) {
-            CurrencyRateDTO rate = rateService.find(toCurrency);
-            if (rate == null)
-                rate = retriever.getRate(toCurrency, LocalDate.now());
-            rateFromUAH = rate.getRate();
+            rateFromUAH = retriever.getRate(fromCurrency, LocalDate.now())
+                    .getRate();
         }
 
         return amount * rateToUAH / rateFromUAH;
