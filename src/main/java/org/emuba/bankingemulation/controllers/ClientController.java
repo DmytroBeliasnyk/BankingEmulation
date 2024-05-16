@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -86,8 +85,8 @@ public class ClientController {
 
         double convertedAmount = amount;
         if (from.getCurrency() != to.getCurrency()) {
-            convertedAmount = converter(from.getCurrency().toString(), to.getCurrency().toString(),
-                    LocalDate.now(), amount);
+            convertedAmount = converter(from.getCurrency().toString(),
+                    to.getCurrency().toString(), amount);
         }
 
         from.setBalance(from.getBalance() - amount);
@@ -163,19 +162,18 @@ public class ClientController {
         return false;
     }
 
-    private double converter(String fromCurrency, String toCurrency, LocalDate date,
-                             double amount) {
+    private double converter(String fromCurrency, String toCurrency, double amount) {
         double rateToUAH = 1;
         double rateFromUAH = 1;
 
         if (!fromCurrency.equals("UAH")) {
-            CurrencyRateDTO rate = rateService.find(fromCurrency, LocalDate.now());
+            CurrencyRateDTO rate = rateService.find(fromCurrency);
             if (rate == null)
                 rate = retriever.getRate(fromCurrency, LocalDate.now());
             rateToUAH = rate.getRate();
         }
         if (!toCurrency.equals("UAH")) {
-            CurrencyRateDTO rate = rateService.find(toCurrency, LocalDate.now());
+            CurrencyRateDTO rate = rateService.find(toCurrency);
             if (rate == null)
                 rate = retriever.getRate(toCurrency, LocalDate.now());
             rateFromUAH = rate.getRate();
