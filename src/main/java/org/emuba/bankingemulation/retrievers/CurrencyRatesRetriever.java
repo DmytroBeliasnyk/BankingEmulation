@@ -28,7 +28,7 @@ public class CurrencyRatesRetriever {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<CurrencyRate[]> response = restTemplate.getForEntity(url,
                 CurrencyRate[].class);
-        if (Objects.isNull(response.getBody()[0])) {
+        if (Objects.isNull(Objects.requireNonNull(response.getBody())[0])) {
             return new CurrencyRate().toDTO();
         }
         rateService.save(response.getBody()[0]);
