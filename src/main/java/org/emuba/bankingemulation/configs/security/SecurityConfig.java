@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .exceptionHandling(handling -> handling
                         .authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(management -> management
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .sessionCreationPolicy(SessionCreationPolicy.NEVER))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/client/**", "/rate/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
