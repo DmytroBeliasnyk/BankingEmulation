@@ -30,7 +30,9 @@ public class RateServiceImpl implements RateService {
     @Override
     @Transactional(readOnly = true)
     public CurrencyRateDTO find(String currency) {
-        return rateRepository.findByCurrency(currency).toDTO();
+        return rateRepository.findByCurrency(currency)
+                .map(CurrencyRate::toDTO)
+                .orElse(null);
     }
 
     @Override
