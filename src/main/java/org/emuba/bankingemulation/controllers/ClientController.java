@@ -7,6 +7,7 @@ import org.emuba.bankingemulation.enums.ClientRequestType;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.models.Account;
 import org.emuba.bankingemulation.models.CustomClient;
+import org.emuba.bankingemulation.retrievers.CurrencyRatesRetriever;
 import org.emuba.bankingemulation.services.impl.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -29,15 +30,17 @@ public class ClientController {
     private final RatesServiceImpl ratesService;
     private final HistoryServiceImpl historyService;
     private final ClientRequestServiceImpl dataRequestService;
+    private final CurrencyRatesRetriever retriever;
 
     public ClientController(ClientServiceImpl clientService, AccountServiceImpl accountService,
                             RatesServiceImpl ratesService, HistoryServiceImpl historyService,
-                            ClientRequestServiceImpl dataRequestService) {
+                            ClientRequestServiceImpl dataRequestService, CurrencyRatesRetriever retriever) {
         this.clientService = clientService;
         this.accountService = accountService;
         this.ratesService = ratesService;
         this.historyService = historyService;
         this.dataRequestService = dataRequestService;
+        this.retriever = retriever;
     }
 
     @GetMapping("get_account")
@@ -159,15 +162,15 @@ public class ClientController {
     }
 
     private double converter(String fromCurrency, String toCurrency, double amount) {
-        double rateToUAH = 1;
         double rateFromUAH = 1;
+        double rateToUAH = 1;
 
         if (!fromCurrency.equalsIgnoreCase("UAH")) {
-            rateToUAH = ratesService.find(fromCurrency)
+            rateFromUAH = retriever.getRate(fromCurrency, LocalDate.now())
                     .getRate();
         }
         if (!toCurrency.equalsIgnoreCase("UAH")) {
-            rateFromUAH = ratesService.find(toCurrency)
+            rateToUAH = retriever.getRate(toCurrency, LocalDate.now())
                     .getRate();
         }
 

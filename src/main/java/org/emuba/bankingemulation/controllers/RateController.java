@@ -26,11 +26,11 @@ public class RateController {
 
     @GetMapping("get")
     public ResponseEntity<CurrencyRateDTO> getRate(@RequestParam String currency) {
-        CurrencyRateDTO currencyRate = ratesService.find(currency);
+        /*CurrencyRateDTO currencyRate = ratesService.find(currency);
 
         if (currencyRate != null)
             return new ResponseEntity<>(currencyRate, HttpStatus.OK);
-
+*/
         return new ResponseEntity<>(retriever.getRate(currency, LocalDate.now()),
                 HttpStatus.OK);
     }
