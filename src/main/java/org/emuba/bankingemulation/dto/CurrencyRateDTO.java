@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class CurrencyRateDTO {
+    private Long id;
     @JsonProperty("cc")
     private String currency;
     private double rate;
