@@ -25,7 +25,7 @@ public class RateController {
 
     @GetMapping("get")
     public ResponseEntity<CurrencyRateDTO> getRate(@RequestParam String currency) {
-        CurrencyRateDTO rate = rateService.find(currency);
+        CurrencyRateDTO rate = rateService.find(currency.toUpperCase());
         if (rate != null)
             return new ResponseEntity<>(rate, HttpStatus.OK);
 
