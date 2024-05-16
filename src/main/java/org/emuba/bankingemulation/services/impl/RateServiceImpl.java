@@ -38,6 +38,7 @@ public class RateServiceImpl implements RateService {
     @Override
     @Transactional
     @Scheduled(cron = "0 30 15 * * *", zone = "Europe/Kiev")
+    @Scheduled(cron = "0 0 0 * * *")
     public void deleteNonActualRates() {
         String date = LocalDate.now()
                 .format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
