@@ -10,5 +10,7 @@ public interface RatesRepository extends JpaRepository<CurrencyRate, Long> {
 
     Boolean existsByDate(String date);
 
+    Boolean existsByCurrency(String currency);
+
     void deleteAllByDate(String date);
 }

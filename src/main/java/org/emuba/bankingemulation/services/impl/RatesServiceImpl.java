@@ -35,6 +35,12 @@ public class RatesServiceImpl implements RatesService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public boolean exists(String currency) {
+        return ratesRepository.existsByCurrency(currency);
+    }
+
+    @Override
     @Transactional
     @Scheduled(cron = "0 30 15 * * *", zone = "Europe/Kiev")
     @Scheduled(cron = "0 0 0 * * *")

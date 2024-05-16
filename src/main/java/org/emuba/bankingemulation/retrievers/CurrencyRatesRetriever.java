@@ -30,7 +30,9 @@ public class CurrencyRatesRetriever {
 
         CurrencyRate rate = response.getBody()[0];
 
-        ratesService.save(rate);
+        if (!ratesService.exists(rate.getCurrency()))
+            ratesService.save(rate);
+
         return rate.toDTO();
     }
 }
