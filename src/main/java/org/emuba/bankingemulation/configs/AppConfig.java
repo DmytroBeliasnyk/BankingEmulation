@@ -22,9 +22,9 @@ public class AppConfig {
             @Override
             public void run(String... args) throws Exception {
                 clientService.addClient("Admin", "Admin", null,
-                        "admin", encoder.encode("admin"), UserRole.ADMIN);
+                        "admin", encoder.encode("123admin"), UserRole.ADMIN);
                 clientService.addClient("Dmytro", "Beliasnyk", "dimabelasnik6@gmail.com",
-                        "user", encoder.encode("user"), UserRole.USER);
+                        "user", encoder.encode("123user"), UserRole.USER);
             }
         };
     }
