@@ -1,6 +1,7 @@
 package org.emuba.bankingemulation.retrievers;
 
 import org.emuba.bankingemulation.dto.CurrencyRateDTO;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,8 +18,9 @@ public class CurrencyRatesRetriever {
                 .replace("________", date.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
 
         RestTemplate restTemplate = new RestTemplate();
-        CurrencyRateDTO[] response = restTemplate.getForObject(url, CurrencyRateDTO[].class);
+        ResponseEntity<CurrencyRateDTO[]> response = restTemplate.getForEntity(
+                url, CurrencyRateDTO[].class);
 
-        return response[0];
+        return response.getBody()[0];
     }
 }
