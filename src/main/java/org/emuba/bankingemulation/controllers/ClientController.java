@@ -27,17 +27,15 @@ import java.util.Optional;
 public class ClientController {
     private final ClientServiceImpl clientService;
     private final AccountServiceImpl accountService;
-    private final RatesServiceImpl ratesService;
     private final HistoryServiceImpl historyService;
     private final ClientRequestServiceImpl dataRequestService;
     private final CurrencyRatesRetriever retriever;
 
     public ClientController(ClientServiceImpl clientService, AccountServiceImpl accountService,
-                            RatesServiceImpl ratesService, HistoryServiceImpl historyService,
-                            ClientRequestServiceImpl dataRequestService, CurrencyRatesRetriever retriever) {
+                            HistoryServiceImpl historyService, ClientRequestServiceImpl dataRequestService,
+                            CurrencyRatesRetriever retriever) {
         this.clientService = clientService;
         this.accountService = accountService;
-        this.ratesService = ratesService;
         this.historyService = historyService;
         this.dataRequestService = dataRequestService;
         this.retriever = retriever;

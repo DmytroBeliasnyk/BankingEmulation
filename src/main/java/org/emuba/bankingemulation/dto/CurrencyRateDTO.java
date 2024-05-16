@@ -1,20 +1,13 @@
 package org.emuba.bankingemulation.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
 public class CurrencyRateDTO {
+    @JsonProperty("cc")
     private String currency;
     private double rate;
+    @JsonProperty("exchangedate")
     private String date;
-
-    private CurrencyRateDTO(String currency, double rate, String date) {
-        this.currency = currency;
-        this.rate = rate;
-        this.date = date;
-    }
-
-    public static CurrencyRateDTO of(String currency, double rate, String date) {
-        return new CurrencyRateDTO(currency, rate, date);
-    }
 }
