@@ -163,11 +163,11 @@ public class ClientController {
         double rateFromUAH = 1;
 
         if (!fromCurrency.equalsIgnoreCase("UAH")) {
-            rateToUAH = ratesService.find(fromCurrency, LocalDate.now())
+            rateToUAH = ratesService.find(fromCurrency)
                     .getRate();
         }
         if (!toCurrency.equalsIgnoreCase("UAH")) {
-            rateFromUAH = ratesService.find(toCurrency, LocalDate.now())
+            rateFromUAH = ratesService.find(toCurrency)
                     .getRate();
         }
 
