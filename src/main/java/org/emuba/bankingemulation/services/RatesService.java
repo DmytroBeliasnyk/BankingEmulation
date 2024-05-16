@@ -8,7 +8,7 @@ import java.time.LocalDate;
 public interface RatesService {
     void save(CurrencyRate currencyRate);
 
-    CurrencyRateDTO find(String currency, LocalDate date);
+    CurrencyRateDTO find(String currency);
 
     void deleteNonActualRates();
 }

@@ -29,9 +29,8 @@ public class RatesServiceImpl implements RatesService {
 
     @Override
     @Transactional(readOnly = true)
-    public CurrencyRateDTO find(String currency, LocalDate date) {
-        String formatted = date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-        return ratesRepository.findByCurrencyAndDate(currency, formatted)
+    public CurrencyRateDTO find(String currency) {
+        return ratesRepository.findByCurrency(currency)
                 .map(CurrencyRate::toDTO).orElse(null);
     }
 
