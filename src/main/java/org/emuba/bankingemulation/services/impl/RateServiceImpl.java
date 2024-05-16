@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
@@ -30,10 +29,8 @@ public class RateServiceImpl implements RateService {
 
     @Override
     @Transactional(readOnly = true)
-    public CurrencyRateDTO find(String currency, LocalDate date) {
-        String formatted = date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-        return rateRepository.findByCurrencyAndDate(currency, formatted)
-                .map(CurrencyRate::toDTO).orElse(null);
+    public CurrencyRateDTO find(String currency) {
+        return rateRepository.findByCurrency(currency).toDTO();
     }
 
     @Override
