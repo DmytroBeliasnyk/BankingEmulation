@@ -162,18 +162,18 @@ public class ClientController {
     }
 
     private double converter(String fromCurrency, String toCurrency, double amount) {
-        double rateFromUAH = 1;
-        double rateToUAH = 1;
+        double rateFrom = 1;
+        double rateTo = 1;
 
         if (!fromCurrency.equalsIgnoreCase("UAH")) {
-            rateFromUAH = retriever.getRate(fromCurrency, LocalDate.now())
+            rateFrom = retriever.getRate(fromCurrency, LocalDate.now())
                     .getRate();
         }
         if (!toCurrency.equalsIgnoreCase("UAH")) {
-            rateToUAH = retriever.getRate(toCurrency, LocalDate.now())
+            rateTo = retriever.getRate(toCurrency, LocalDate.now())
                     .getRate();
         }
 
-        return amount * rateToUAH / rateFromUAH;
+        return amount * rateFrom / rateTo;
     }
 }
