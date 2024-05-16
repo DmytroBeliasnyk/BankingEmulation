@@ -7,11 +7,7 @@ import org.emuba.bankingemulation.enums.ClientRequestType;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.models.Account;
 import org.emuba.bankingemulation.models.CustomClient;
-import org.emuba.bankingemulation.retrievers.CurrencyRatesRetriever;
-import org.emuba.bankingemulation.services.impl.AccountServiceImpl;
-import org.emuba.bankingemulation.services.impl.ClientRequestServiceImpl;
-import org.emuba.bankingemulation.services.impl.ClientServiceImpl;
-import org.emuba.bankingemulation.services.impl.HistoryServiceImpl;
+import org.emuba.bankingemulation.services.impl.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -30,18 +26,18 @@ import java.util.Optional;
 public class ClientController {
     private final ClientServiceImpl clientService;
     private final AccountServiceImpl accountService;
+    private final RatesServiceImpl ratesService;
     private final HistoryServiceImpl historyService;
     private final ClientRequestServiceImpl dataRequestService;
-    private final CurrencyRatesRetriever retriever;
 
     public ClientController(ClientServiceImpl clientService, AccountServiceImpl accountService,
-                            HistoryServiceImpl historyService, ClientRequestServiceImpl dataRequestService,
-                            CurrencyRatesRetriever retriever) {
+                            RatesServiceImpl ratesService, HistoryServiceImpl historyService,
+                            ClientRequestServiceImpl dataRequestService) {
         this.clientService = clientService;
         this.accountService = accountService;
+        this.ratesService = ratesService;
         this.historyService = historyService;
         this.dataRequestService = dataRequestService;
-        this.retriever = retriever;
     }
 
     @GetMapping("get_account")
@@ -166,12 +162,12 @@ public class ClientController {
         double rateToUAH = 1;
         double rateFromUAH = 1;
 
-        if (!fromCurrency.equals("UAH")) {
-            rateToUAH = retriever.getRate(fromCurrency, LocalDate.now())
+        if (!fromCurrency.equalsIgnoreCase("UAH")) {
+            rateToUAH = ratesService.find(fromCurrency, LocalDate.now())
                     .getRate();
         }
-        if (!toCurrency.equals("UAH")) {
-            rateFromUAH = retriever.getRate(fromCurrency, LocalDate.now())
+        if (!toCurrency.equalsIgnoreCase("UAH")) {
+            rateFromUAH = ratesService.find(toCurrency, LocalDate.now())
                     .getRate();
         }
 
