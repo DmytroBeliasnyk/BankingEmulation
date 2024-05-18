@@ -22,6 +22,6 @@ public class AccountDTO {
     @Override
     public String toString() {
         return "Your account " + accountNumber + System.lineSeparator() +
-                "balance: " + balance + " " + currency;
+                "balance: " + balance + " " + currency + System.lineSeparator();
     }
 }

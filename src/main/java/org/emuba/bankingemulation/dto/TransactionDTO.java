@@ -4,6 +4,7 @@ import lombok.Data;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Data
 public class TransactionDTO {
@@ -44,12 +45,12 @@ public class TransactionDTO {
 
     @Override
     public String toString() {
-        return "Transaction " + id + System.lineSeparator() +
+        return "Transaction " + id + " " + date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")) +
+                System.lineSeparator() + System.lineSeparator() +
                 "From: " + fromName + System.lineSeparator() +
-                fromAccount + fromCurrency + System.lineSeparator() +
+                fromAccount + " " + fromCurrency + System.lineSeparator() + System.lineSeparator() +
                 "To: " + toName + System.lineSeparator() +
                 toAccount + toCurrency + System.lineSeparator() +
-                amount + fromCurrency + System.lineSeparator() +
-                date;
+                amount + " " + fromCurrency;
     }
 }
