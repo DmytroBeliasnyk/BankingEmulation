@@ -1,13 +1,14 @@
 package org.emuba.bankingemulation.controllers;
 
+import jakarta.mail.MessagingException;
 import org.emuba.bankingemulation.dto.ClientDTO;
 import org.emuba.bankingemulation.dto.ClientRequestDTO;
 import org.emuba.bankingemulation.dto.PageCountDTO;
 import org.emuba.bankingemulation.enums.ClientRequestType;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.models.Account;
-import org.emuba.bankingemulation.models.CustomClient;
 import org.emuba.bankingemulation.models.ClientRequest;
+import org.emuba.bankingemulation.models.CustomClient;
 import org.emuba.bankingemulation.services.impl.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -89,21 +90,29 @@ public class AdminController {
 
         ClientRequest request = dataRequestService.find(dataId);
         CustomClient client = request.getClient();
-
-        if (request.getClientRequestType() == ClientRequestType.ACCOUNT_BALANCE) {
-            StringBuilder sb = new StringBuilder();
-            for (var a : accountService.findAllByClient(client)) {
-                sb.append(a.toString())
-                        .append(System.lineSeparator());
+        try {
+            if (request.getClientRequestType() == ClientRequestType.ACCOUNT_BALANCE) {
+                StringBuilder sb = new StringBuilder();
+                for (var a : accountService.findAllByClient(client)) {
+                    sb.append(a.toString())
+                            .append(System.lineSeparator());
+                }
+                mailService.sendEmail(
+                        client.getEmail(),
+                        ClientRequestType.ACCOUNT_BALANCE,
+                        "Your account balance",
+                        sb.toString());
+            } else {
+                mailService.sendEmail(
+                        client.getEmail(),
+                        ClientRequestType.TRANSACTION_CONFIRMATION,
+                        "Confirmation of your transaction",
+                        historyService.find(dataId).toString());
             }
-            mailService.sendEmail(client.getEmail(),
-                    ClientRequestType.ACCOUNT_BALANCE, sb.toString());
-        } else {
-            mailService.sendEmail(client.getEmail(),
-                    ClientRequestType.TRANSACTION_CONFIRMATION,
-                    historyService.find(dataId).toString());
+            dataRequestService.delete(request.getId());
+        } catch (MessagingException e) {
+            return new ResponseEntity<>("Delivery failed", HttpStatus.BAD_REQUEST);
         }
-        dataRequestService.delete(request.getId());
 
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }
