@@ -18,7 +18,7 @@ public class AccountNumberGenerator {
         String accountNumber;
         do {
             accountNumber = generateRandomAccountNumber();
-        } while (accountRepository.existsByAccountNumber(accountNumber));
+        } while (accountRepository.existsByAccountNumber(accountNumber) || accountNumber.startsWith("0"));
         return accountNumber;
     }
 

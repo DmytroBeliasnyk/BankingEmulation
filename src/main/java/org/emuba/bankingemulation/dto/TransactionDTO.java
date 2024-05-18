@@ -50,7 +50,7 @@ public class TransactionDTO {
                 "From: " + fromName + System.lineSeparator() +
                 fromAccount + " " + fromCurrency + System.lineSeparator() + System.lineSeparator() +
                 "To: " + toName + System.lineSeparator() +
-                toAccount + toCurrency + System.lineSeparator() +
+                toAccount + " " + toCurrency + System.lineSeparator() +
                 amount + " " + fromCurrency;
     }
 }
