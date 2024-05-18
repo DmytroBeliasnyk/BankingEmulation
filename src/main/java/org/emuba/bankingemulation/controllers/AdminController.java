@@ -1,6 +1,5 @@
 package org.emuba.bankingemulation.controllers;
 
-import jakarta.mail.MessagingException;
 import org.emuba.bankingemulation.dto.ClientDTO;
 import org.emuba.bankingemulation.dto.ClientRequestDTO;
 import org.emuba.bankingemulation.dto.PageCountDTO;
@@ -90,29 +89,24 @@ public class AdminController {
 
         ClientRequest request = dataRequestService.find(dataId);
         CustomClient client = request.getClient();
-        try {
-            if (request.getClientRequestType() == ClientRequestType.ACCOUNT_BALANCE) {
-                StringBuilder sb = new StringBuilder();
-                for (var a : accountService.findAllByClient(client)) {
-                    sb.append(a.toString())
-                            .append(System.lineSeparator());
-                }
-                mailService.sendEmail(
-                        client.getEmail(),
-                        ClientRequestType.ACCOUNT_BALANCE,
-                        "Your account balance",
-                        sb.toString());
-            } else {
-                mailService.sendEmail(
-                        client.getEmail(),
-                        ClientRequestType.TRANSACTION_CONFIRMATION,
-                        "Confirmation of your transaction",
-                        historyService.find(dataId).toString());
+
+        if (request.getClientRequestType() == ClientRequestType.ACCOUNT_BALANCE) {
+            StringBuilder sb = new StringBuilder();
+            for (var account : accountService.findAllByClient(client)) {
+                sb.append(account.toString())
+                        .append(System.lineSeparator());
             }
-            dataRequestService.delete(request.getId());
-        } catch (MessagingException e) {
-            return new ResponseEntity<>("Delivery failed", HttpStatus.BAD_REQUEST);
+            mailService.sendEmail(
+                    client.getEmail(),
+                    ClientRequestType.ACCOUNT_BALANCE,
+                    sb.toString());
+        } else {
+            mailService.sendEmail(
+                    client.getEmail(),
+                    ClientRequestType.TRANSACTION_CONFIRMATION,
+                    historyService.find(dataId).toString());
         }
+        dataRequestService.delete(request.getId());
 
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }

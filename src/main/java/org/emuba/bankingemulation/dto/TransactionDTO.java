@@ -41,4 +41,15 @@ public class TransactionDTO {
         return new TransactionDTO(id, fromName, fromAccount, fromCurrency,
                 toName, toAccount, toCurrency, date, amount);
     }
+
+    @Override
+    public String toString() {
+        return "Transaction " + id + System.lineSeparator() +
+                "From: " + fromName + System.lineSeparator() +
+                fromAccount + fromCurrency + System.lineSeparator() +
+                "To: " + toName + System.lineSeparator() +
+                toAccount + toCurrency + System.lineSeparator() +
+                amount + fromCurrency + System.lineSeparator() +
+                date;
+    }
 }

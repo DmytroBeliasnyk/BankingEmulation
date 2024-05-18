@@ -5,12 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.emuba.bankingemulation.dto.AccountDTO;
 import org.emuba.bankingemulation.enums.TypeCurrency;
-import org.emuba.bankingemulation.services.impl.AccountServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor

@@ -18,4 +18,10 @@ public class AccountDTO {
     public static AccountDTO of(String accountNumber, TypeCurrency currency, double balance) {
         return new AccountDTO(accountNumber, currency, balance);
     }
+
+    @Override
+    public String toString() {
+        return "Your account " + accountNumber + System.lineSeparator() +
+                "balance: " + balance + " " + currency;
+    }
 }
