@@ -43,7 +43,7 @@ public class TransactionDTO {
                 toName, toAccount, toCurrency, date, amount);
     }
 
-    /*@Override
+    @Override
     public String toString() {
         return "Transaction " + id + " " + date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")) +
                 System.lineSeparator() + System.lineSeparator() +
@@ -52,5 +52,5 @@ public class TransactionDTO {
                 "To: " + toName + System.lineSeparator() +
                 toAccount + " " + toCurrency + System.lineSeparator() + System.lineSeparator() +
                 amount + " " + fromCurrency;
-    }*/
+    }
 }
