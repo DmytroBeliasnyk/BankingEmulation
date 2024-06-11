@@ -55,7 +55,7 @@ public class AppConfig {
         return mailSender;
     }
 
-    /*@Bean
+    @Bean
     public BasicDataSource dataSource() throws URISyntaxException {
         String dbUrl = System.getenv("JDBC_DATABASE_URL");
         String username = System.getenv("JDBC_DATABASE_USERNAME");
@@ -67,6 +67,6 @@ public class AppConfig {
         basicDataSource.setPassword(password);
 
         return basicDataSource;
-    }*/
+    }
 }
 
