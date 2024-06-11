@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class HistoryServiceImpl implements HistoryService {
     public void saveTransaction(CustomClient fromClient, String fromAccountNumber,
                                 TypeCurrency fromCurrency, CustomClient toClient,
                                 String toAccountNumber, TypeCurrency toCurrency,
-                                LocalDateTime date, double amount) {
+                                LocalDateTime date, BigDecimal amount) {
         historyRepository.save(TransactionHistory.of(fromClient, fromAccountNumber, fromCurrency,
                 toClient, toAccountNumber, toCurrency, date, amount));
     }

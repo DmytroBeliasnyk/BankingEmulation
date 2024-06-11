@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import org.emuba.bankingemulation.dto.AccountDTO;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @Entity
@@ -21,7 +23,7 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private TypeCurrency currency;
 
-    private double balance;
+    private BigDecimal balance =BigDecimal.ZERO;
 
     private Account(String accountNumber, TypeCurrency currency) {
         this.accountNumber = accountNumber;

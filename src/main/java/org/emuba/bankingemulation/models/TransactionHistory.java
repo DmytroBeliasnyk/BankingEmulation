@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.emuba.bankingemulation.dto.TransactionDTO;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -30,11 +31,11 @@ public class TransactionHistory {
 
     private LocalDateTime date;
 
-    private double amount;
+    private BigDecimal amount;
 
     private TransactionHistory(CustomClient fromClient, String fromAccountNumber, TypeCurrency fromCurrency,
                                CustomClient toClient, String toAccountNumber, TypeCurrency toCurrency,
-                               LocalDateTime date, double amount) {
+                               LocalDateTime date, BigDecimal amount) {
         this.fromClient = fromClient;
         this.fromAccountNumber = fromAccountNumber;
         this.fromCurrency = fromCurrency;
@@ -47,7 +48,7 @@ public class TransactionHistory {
 
     public static TransactionHistory of(CustomClient fromClient, String fromAccountNumber, TypeCurrency fromCurrency,
                                         CustomClient toClient, String toAccountNumber, TypeCurrency toCurrency,
-                                        LocalDateTime date, double amount) {
+                                        LocalDateTime date, BigDecimal amount) {
         return new TransactionHistory(fromClient, fromAccountNumber, fromCurrency,
                 toClient, toAccountNumber, toCurrency, date, amount);
     }

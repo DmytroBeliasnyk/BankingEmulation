@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -54,14 +55,14 @@ public class AdminController {
 
     @PutMapping("add_money")
     public ResponseEntity<String> addMoney(@RequestParam Long clientId,
-                                           @RequestParam double amount) {
-        if (amount <= 0)
+                                           @RequestParam BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0)
             return new ResponseEntity<>("Negative value", HttpStatus.BAD_REQUEST);
 
         CustomClient client = clientService.findById(clientId);
         Account account = accountService.
                 findAccount(TypeCurrency.UAH, client.getLogin()).get();
-        account.setBalance(account.getBalance() + amount);
+        account.setBalance(account.getBalance().add(amount));
 
         accountService.updateBalance(clientId, TypeCurrency.UAH, account.getBalance());
         return new ResponseEntity<>("Success", HttpStatus.OK);

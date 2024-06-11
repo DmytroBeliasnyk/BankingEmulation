@@ -5,13 +5,14 @@ import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.models.CustomClient;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface HistoryService {
     void saveTransaction(CustomClient fromClient, String fromAccountNumber, TypeCurrency fromCurrency,
                          CustomClient toClient, String toAccountNumber, TypeCurrency toCurrency,
-                         LocalDateTime date, double amount);
+                         LocalDateTime date, BigDecimal amount);
 
     TransactionDTO find(Long id);
 

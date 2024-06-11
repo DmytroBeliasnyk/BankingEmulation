@@ -3,6 +3,7 @@ package org.emuba.bankingemulation.dto;
 import lombok.Data;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -20,11 +21,11 @@ public class TransactionDTO {
 
     private LocalDateTime date;
 
-    private double amount;
+    private BigDecimal amount;
 
     private TransactionDTO(Long id, String fromName, String fromAccount, TypeCurrency fromCurrency,
                            String toName, String toAccount, TypeCurrency toCurrency,
-                           LocalDateTime date, double amount) {
+                           LocalDateTime date, BigDecimal amount) {
         this.id = id;
         this.fromName = fromName;
         this.fromAccount = fromAccount;
@@ -38,7 +39,7 @@ public class TransactionDTO {
 
     public static TransactionDTO of(Long id, String fromName, String fromAccount, TypeCurrency fromCurrency,
                                     String toName, String toAccount, TypeCurrency toCurrency,
-                                    LocalDateTime date, double amount) {
+                                    LocalDateTime date, BigDecimal amount) {
         return new TransactionDTO(id, fromName, fromAccount, fromCurrency,
                 toName, toAccount, toCurrency, date, amount);
     }

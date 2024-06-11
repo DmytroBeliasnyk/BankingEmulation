@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +18,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     @Modifying
     @Query("UPDATE Account a SET a.balance = :newBalance WHERE a.client.id = :clientId AND a.currency = :currency")
-    void updateBalance(Long clientId, TypeCurrency currency, double newBalance);
+    void updateBalance(Long clientId, TypeCurrency currency, BigDecimal newBalance);
 
     List<Account> findAllByClient(CustomClient client);
 
