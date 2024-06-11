@@ -23,7 +23,7 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private TypeCurrency currency;
 
-    private BigDecimal balance =BigDecimal.ZERO;
+    private BigDecimal balance = BigDecimal.ZERO;
 
     private Account(String accountNumber, TypeCurrency currency) {
         this.accountNumber = accountNumber;
