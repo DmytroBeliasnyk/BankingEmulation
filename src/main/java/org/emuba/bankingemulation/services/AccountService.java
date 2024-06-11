@@ -5,6 +5,7 @@ import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.models.Account;
 import org.emuba.bankingemulation.models.CustomClient;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,5 +18,5 @@ public interface AccountService {
 
     Optional<Account> findAccountByNumber(String accountNumber);
 
-    void updateBalance(Long clientId, TypeCurrency currency, double newBalance);
+    void updateBalance(Long clientId, TypeCurrency currency, BigDecimal newBalance);
 }
