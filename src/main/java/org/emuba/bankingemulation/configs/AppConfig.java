@@ -3,9 +3,11 @@ package org.emuba.bankingemulation.configs;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.emuba.bankingemulation.enums.UserRole;
 import org.emuba.bankingemulation.services.impl.ClientServiceImpl;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,8 +15,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.net.URISyntaxException;
 import java.util.Properties;
 
+@PropertySource("classpath:email_config.txt")
 @Configuration
 public class AppConfig {
+    @Value("${EMAIL_USERNAME}")
+    private String EMAIL_USERNAME;
+    @Value("${EMAIL_PASSWORD}")
+    private String EMAIL_PASSWORD;
+
     @Bean
     public CommandLineRunner commandLineRunner(final ClientServiceImpl clientService,
                                                final PasswordEncoder encoder) {
@@ -35,8 +43,8 @@ public class AppConfig {
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
 
-        mailSender.setUsername("emubank.bot@gmail.com");
-        mailSender.setPassword("kdwmyrikrdqjtjop");
+        mailSender.setUsername(EMAIL_USERNAME);
+        mailSender.setPassword(EMAIL_PASSWORD);
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
@@ -61,3 +69,4 @@ public class AppConfig {
         return basicDataSource;
     }
 }
+
