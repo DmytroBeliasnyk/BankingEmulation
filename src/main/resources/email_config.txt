@@ -1,0 +1,2 @@
+EMAIL_USERNAME=emubank.bot@gmail.com
+EMAIL_PASSWORD=kdwmyrikrdqjtjop
