@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Email config file ###
+src/main/resources/email_config.txt

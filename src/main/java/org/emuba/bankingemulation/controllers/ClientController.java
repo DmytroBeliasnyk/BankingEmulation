@@ -8,7 +8,10 @@ import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.models.Account;
 import org.emuba.bankingemulation.models.CustomClient;
 import org.emuba.bankingemulation.retrievers.CurrencyRatesRetriever;
-import org.emuba.bankingemulation.services.impl.*;
+import org.emuba.bankingemulation.services.impl.AccountServiceImpl;
+import org.emuba.bankingemulation.services.impl.ClientRequestServiceImpl;
+import org.emuba.bankingemulation.services.impl.ClientServiceImpl;
+import org.emuba.bankingemulation.services.impl.HistoryServiceImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -19,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,7 +81,7 @@ public class ClientController {
         Account from = optFrom.get();
         Account to = optTo.get();
 
-        if (from.getBalance().compareTo(amount) <0 || from.getAccountNumber().equals(to.getAccountNumber()))
+        if (from.getBalance().compareTo(amount) < 0 || from.getAccountNumber().equals(to.getAccountNumber()))
             return new ResponseEntity<>("Negative amount", HttpStatus.BAD_REQUEST);
 
         BigDecimal convertedAmount = amount;
@@ -94,7 +97,7 @@ public class ClientController {
         accountService.updateBalance(to.getClient().getId(), to.getCurrency(), to.getBalance());
 
         historyService.saveTransaction(from.getClient(), from.getAccountNumber(), from.getCurrency(),
-                to.getClient(), toAccountNumber, to.getCurrency(), LocalDateTime.now(), amount);
+                to.getClient(), toAccountNumber, to.getCurrency(), LocalDate.now(), amount);
 
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }
@@ -113,7 +116,46 @@ public class ClientController {
     @GetMapping("transactions")
     public List<TransactionDTO> getTransactions(@RequestParam(required = false, defaultValue = "0")
                                                 int page) {
+        if (page < 0) page = 0;
         return historyService.findByClientLogin(getCurrentUser().getUsername(),
+                PageRequest.of(page, 10, Sort.Direction.DESC, "id"));
+    }
+
+    @GetMapping("transactions_by_date")
+    public List<TransactionDTO> getTransactionsByDate(@RequestParam String date,
+                                                      @RequestParam(required = false, defaultValue = "0")
+                                                      int page) {
+        if (page < 0) page = 0;
+
+        LocalDate dateOfTransaction;
+        try {
+            dateOfTransaction = LocalDate.parse(date);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid date format, expected format is YYYY-MM-DD", e);
+        }
+
+        return historyService.findAllByDate(getCurrentUser().getUsername(), dateOfTransaction,
+                PageRequest.of(page, 10, Sort.Direction.DESC, "id"));
+    }
+
+    @GetMapping("transactions_between_date")
+    public List<TransactionDTO> getTransactionsByDate(@RequestParam String startDate,
+                                                      @RequestParam String endDate,
+                                                      @RequestParam(required = false, defaultValue = "0")
+                                                      int page) {
+        if (page < 0) page = 0;
+
+        LocalDate startDateOfTransaction;
+        LocalDate endDateOfTransaction;
+        try {
+            startDateOfTransaction = LocalDate.parse(startDate);
+            endDateOfTransaction = LocalDate.parse(endDate);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid date format, expected format is YYYY-MM-DD", e);
+        }
+
+        return historyService.findAllBetweenDate(getCurrentUser().getUsername(),
+                startDateOfTransaction, endDateOfTransaction,
                 PageRequest.of(page, 10, Sort.Direction.DESC, "id"));
     }
 

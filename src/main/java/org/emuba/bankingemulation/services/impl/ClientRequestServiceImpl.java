@@ -45,6 +45,15 @@ public class ClientRequestServiceImpl implements ClientRequestService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ClientRequestDTO> getAllByType(ClientRequestType clientRequestType, Pageable pageable) {
+        return clientRequestRepository.findAllByClientRequestType(clientRequestType, pageable)
+                .stream()
+                .map(ClientRequest::toDTO)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public ClientRequest find(Long id) {
         return clientRequestRepository.findById(id).get();
     }

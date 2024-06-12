@@ -4,7 +4,7 @@ import lombok.Data;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 @Data
@@ -19,13 +19,13 @@ public class TransactionDTO {
     private String toAccount;
     private TypeCurrency toCurrency;
 
-    private LocalDateTime date;
+    private LocalDate date;
 
     private BigDecimal amount;
 
     private TransactionDTO(Long id, String fromName, String fromAccount, TypeCurrency fromCurrency,
                            String toName, String toAccount, TypeCurrency toCurrency,
-                           LocalDateTime date, BigDecimal amount) {
+                           LocalDate date, BigDecimal amount) {
         this.id = id;
         this.fromName = fromName;
         this.fromAccount = fromAccount;
@@ -39,14 +39,14 @@ public class TransactionDTO {
 
     public static TransactionDTO of(Long id, String fromName, String fromAccount, TypeCurrency fromCurrency,
                                     String toName, String toAccount, TypeCurrency toCurrency,
-                                    LocalDateTime date, BigDecimal amount) {
+                                    LocalDate date, BigDecimal amount) {
         return new TransactionDTO(id, fromName, fromAccount, fromCurrency,
                 toName, toAccount, toCurrency, date, amount);
     }
 
     @Override
     public String toString() {
-        return "Transaction " + id + " " + date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")) +
+        return "Transaction " + id + " " + date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) +
                 System.lineSeparator() + System.lineSeparator() +
                 "From: " + fromName + System.lineSeparator() +
                 fromAccount + " " + fromCurrency + System.lineSeparator() + System.lineSeparator() +

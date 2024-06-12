@@ -14,6 +14,8 @@ public interface ClientRequestService {
 
     List<ClientRequestDTO> getAll(Pageable pageable);
 
+    List<ClientRequestDTO> getAllByType(ClientRequestType clientRequestType, Pageable pageable);
+
     ClientRequest find(Long id);
 
     long count();

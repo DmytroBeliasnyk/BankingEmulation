@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,17 +24,17 @@ import java.util.List;
 public class AdminController {
     private final ClientServiceImpl clientService;
     private final AccountServiceImpl accountService;
-    private final ClientRequestServiceImpl dataRequestService;
+    private final ClientRequestServiceImpl clientRequestService;
     private final HistoryServiceImpl historyService;
     private final MailService mailService;
     private final int PAGE_SIZE = 5;
 
     public AdminController(ClientServiceImpl clientService, AccountServiceImpl accountService,
-                           ClientRequestServiceImpl dataRequestService, HistoryServiceImpl historyService,
+                           ClientRequestServiceImpl clientRequestService, HistoryServiceImpl historyService,
                            MailService mailService) {
         this.clientService = clientService;
         this.accountService = accountService;
-        this.dataRequestService = dataRequestService;
+        this.clientRequestService = clientRequestService;
         this.historyService = historyService;
         this.mailService = mailService;
     }
@@ -72,13 +73,30 @@ public class AdminController {
     public List<ClientRequestDTO> getConfirmations(@RequestParam(required = false, defaultValue = "0")
                                                    int page) {
         if (page < 0) page = 0;
-        return dataRequestService.getAll(PageRequest.of(page, PAGE_SIZE,
-                Sort.Direction.ASC, "id"));
+        return clientRequestService.getAll(PageRequest.of(page, PAGE_SIZE, Sort.Direction.ASC, "id"));
+    }
+
+    @GetMapping("confirmations_by_type")
+    public List<ClientRequestDTO> getConfirmationsByType(@RequestParam(required = false, defaultValue = "0")
+                                                         int page,
+                                                         @RequestParam String requestType) {
+        if (page < 0) page = 0;
+
+        ClientRequestType clientRequestType;
+        try {
+            clientRequestType = ClientRequestType.valueOf(requestType);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Invalid request type");
+        }
+
+        return clientRequestService.getAllByType(clientRequestType,
+                PageRequest.of(page, PAGE_SIZE, Sort.Direction.ASC, "id"));
     }
 
     @GetMapping("pages_confirmations")
     public PageCountDTO pagesConfirmations() {
-        long count = dataRequestService.count();
+        long count = clientRequestService.count();
         long pageCount = (count / PAGE_SIZE) + ((count % PAGE_SIZE == 0) ? 0 : 1);
         return PageCountDTO.of(pageCount, PAGE_SIZE);
     }
@@ -88,7 +106,7 @@ public class AdminController {
         if (dataId == null)
             return new ResponseEntity<>("Not Selected", HttpStatus.BAD_REQUEST);
 
-        ClientRequest request = dataRequestService.find(dataId);
+        ClientRequest request = clientRequestService.find(dataId);
         CustomClient client = request.getClient();
 
         if (request.getClientRequestType() == ClientRequestType.ACCOUNT_BALANCE) {
@@ -107,7 +125,7 @@ public class AdminController {
                     ClientRequestType.TRANSACTION_CONFIRMATION,
                     historyService.find(dataId).toString());
         }
-        dataRequestService.delete(request.getId());
+        clientRequestService.delete(request.getId());
 
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }
