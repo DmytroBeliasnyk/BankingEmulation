@@ -2,6 +2,7 @@ package org.emuba.bankingemulation.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.emuba.bankingemulation.dto.AccountDTO;
 import org.emuba.bankingemulation.enums.TypeCurrency;
@@ -9,6 +10,7 @@ import org.emuba.bankingemulation.enums.TypeCurrency;
 import java.math.BigDecimal;
 
 @Data
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @Entity
 public class Account {

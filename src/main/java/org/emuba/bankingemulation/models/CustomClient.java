@@ -2,16 +2,18 @@ package org.emuba.bankingemulation.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.emuba.bankingemulation.dto.AccountDTO;
 import org.emuba.bankingemulation.dto.ClientDTO;
 import org.emuba.bankingemulation.enums.UserRole;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Data
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @Entity
 public class CustomClient {
@@ -28,7 +30,9 @@ public class CustomClient {
     private UserRole role;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-    private List<Account> accounts = new ArrayList<>();
+    private Set<Account> accounts = new HashSet<>();
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    private Set<Credit> credits = new HashSet<>();
 
     private CustomClient(String name, String surname, String email,
                          String login, String password, UserRole role) {
@@ -38,13 +42,6 @@ public class CustomClient {
         this.login = login;
         this.password = password;
         this.role = role;
-    }
-
-    public void addAccount(Account Account) {
-        if (!accounts.contains(Account)) {
-            accounts.add(Account);
-            Account.setClient(this);
-        }
     }
 
     public static CustomClient of(String name, String surname, String email,
@@ -57,5 +54,13 @@ public class CustomClient {
                 .map(Account::toDTO)
                 .toList();
         return ClientDTO.of(id, name, surname, email, list);
+    }
+
+    public void addAccount(Account account) {
+        if (accounts.add(account)) account.setClient(this);
+    }
+
+    public void addCredit(Credit credit) {
+        if (credits.add(credit)) credit.setClient(this);
     }
 }

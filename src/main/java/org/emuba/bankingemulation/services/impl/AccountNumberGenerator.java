@@ -1,11 +1,12 @@
 package org.emuba.bankingemulation.services.impl;
 
 import org.emuba.bankingemulation.repositories.AccountRepository;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
 
-@Service
+@Component
 public class AccountNumberGenerator {
     private static final Random rnd = new Random();
     private final AccountRepository accountRepository;

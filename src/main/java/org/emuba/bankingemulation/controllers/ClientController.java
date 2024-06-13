@@ -7,17 +7,11 @@ import org.emuba.bankingemulation.enums.ClientRequestType;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.models.Account;
 import org.emuba.bankingemulation.models.CustomClient;
-import org.emuba.bankingemulation.retrievers.CurrencyRatesRetriever;
-import org.emuba.bankingemulation.services.impl.AccountServiceImpl;
-import org.emuba.bankingemulation.services.impl.ClientRequestServiceImpl;
-import org.emuba.bankingemulation.services.impl.ClientServiceImpl;
-import org.emuba.bankingemulation.services.impl.HistoryServiceImpl;
+import org.emuba.bankingemulation.services.impl.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -33,26 +27,26 @@ public class ClientController {
     private final AccountServiceImpl accountService;
     private final HistoryServiceImpl historyService;
     private final ClientRequestServiceImpl dataRequestService;
-    private final CurrencyRatesRetriever retriever;
+    private final SupportingMethodsForControllers supMethod;
 
     public ClientController(ClientServiceImpl clientService, AccountServiceImpl accountService,
                             HistoryServiceImpl historyService, ClientRequestServiceImpl dataRequestService,
-                            CurrencyRatesRetriever retriever) {
+                            SupportingMethodsForControllers supMethod) {
         this.clientService = clientService;
         this.accountService = accountService;
         this.historyService = historyService;
         this.dataRequestService = dataRequestService;
-        this.retriever = retriever;
+        this.supMethod = supMethod;
     }
 
     @GetMapping("get_account")
     public ResponseEntity<?> getAccount(@RequestParam String currency) {
-        if (check(currency))
+        if (supMethod.check(currency) || !currency.equalsIgnoreCase("UAH"))
             return new ResponseEntity<>("Unsupported currency", HttpStatus.BAD_REQUEST);
         TypeCurrency typeOfCurrency = TypeCurrency.valueOf(currency.toUpperCase());
 
         Optional<Account> accountOpt = accountService.findAccount(
-                typeOfCurrency, getCurrentUser().getUsername());
+                typeOfCurrency, supMethod.getCurrentUser().getUsername());
 
         if (accountOpt.isEmpty())
             new ResponseEntity<>("Account was not created", HttpStatus.BAD_REQUEST);
@@ -62,7 +56,7 @@ public class ClientController {
 
     @GetMapping("accounts_list")
     public List<AccountDTO> getAllAccounts() {
-        CustomClient client = clientService.findClientByLogin(getCurrentUser().getUsername());
+        CustomClient client = clientService.findClientByLogin(supMethod.getCurrentUser().getUsername());
         return accountService.findAllByClient(client);
     }
 
@@ -86,7 +80,7 @@ public class ClientController {
 
         BigDecimal convertedAmount = amount;
         if (from.getCurrency() != to.getCurrency()) {
-            convertedAmount = converter(from.getCurrency().toString(),
+            convertedAmount = supMethod.converter(from.getCurrency().toString(),
                     to.getCurrency().toString(), amount);
         }
 
@@ -104,11 +98,11 @@ public class ClientController {
 
     @PutMapping("add_account")
     public ResponseEntity<String> addAccount(@RequestParam String currency) {
-        if (check(currency))
+        if (supMethod.check(currency))
             return new ResponseEntity<>("Unsupported currency", HttpStatus.BAD_REQUEST);
 
         TypeCurrency typeOfCurrency = TypeCurrency.valueOf(currency.toUpperCase());
-        accountService.addNewAccount(typeOfCurrency, getCurrentUser().getUsername());
+        accountService.addNewAccount(typeOfCurrency, supMethod.getCurrentUser().getUsername());
 
         return new ResponseEntity<>("Success", HttpStatus.CREATED);
     }
@@ -117,7 +111,7 @@ public class ClientController {
     public List<TransactionDTO> getTransactions(@RequestParam(required = false, defaultValue = "0")
                                                 int page) {
         if (page < 0) page = 0;
-        return historyService.findByClientLogin(getCurrentUser().getUsername(),
+        return historyService.findByClientLogin(supMethod.getCurrentUser().getUsername(),
                 PageRequest.of(page, 10, Sort.Direction.DESC, "id"));
     }
 
@@ -134,7 +128,7 @@ public class ClientController {
             throw new IllegalArgumentException("Invalid date format, expected format is YYYY-MM-DD", e);
         }
 
-        return historyService.findAllByDate(getCurrentUser().getUsername(), dateOfTransaction,
+        return historyService.findAllByDate(supMethod.getCurrentUser().getUsername(), dateOfTransaction,
                 PageRequest.of(page, 10, Sort.Direction.DESC, "id"));
     }
 
@@ -154,7 +148,7 @@ public class ClientController {
             throw new IllegalArgumentException("Invalid date format, expected format is YYYY-MM-DD", e);
         }
 
-        return historyService.findAllBetweenDate(getCurrentUser().getUsername(),
+        return historyService.findAllBetweenDate(supMethod.getCurrentUser().getUsername(),
                 startDateOfTransaction, endDateOfTransaction,
                 PageRequest.of(page, 10, Sort.Direction.DESC, "id"));
     }
@@ -171,7 +165,7 @@ public class ClientController {
         if (transactionId == null)
             return new ResponseEntity<>("Not Selected", HttpStatus.BAD_REQUEST);
 
-        dataRequestService.add(getCurrentUser().getUsername(),
+        dataRequestService.add(supMethod.getCurrentUser().getUsername(),
                 ClientRequestType.TRANSACTION_CONFIRMATION, transactionId);
 
         return new ResponseEntity<>("Success", HttpStatus.OK);
@@ -179,42 +173,8 @@ public class ClientController {
 
     @GetMapping("account_balance")
     public ResponseEntity<String> getAccountBalance() {
-        dataRequestService.add(getCurrentUser().getUsername(),
+        dataRequestService.add(supMethod.getCurrentUser().getUsername(),
                 ClientRequestType.ACCOUNT_BALANCE, null);
         return new ResponseEntity<>("Success", HttpStatus.OK);
-    }
-
-    private User getCurrentUser() {
-        return (User) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-    }
-
-    private boolean check(String currency) {
-        if (currency == null)
-            return true;
-        try {
-            TypeCurrency typeOfCurrency = TypeCurrency.valueOf(currency.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return true;
-        }
-        return false;
-    }
-
-    private BigDecimal converter(String fromCurrency, String toCurrency, BigDecimal amount) {
-        double rateFrom = 1;
-        double rateTo = 1;
-
-        if (!fromCurrency.equalsIgnoreCase("UAH")) {
-            rateFrom = retriever.getRate(fromCurrency, LocalDate.now())
-                    .getRate();
-        }
-        if (!toCurrency.equalsIgnoreCase("UAH")) {
-            rateTo = retriever.getRate(toCurrency, LocalDate.now())
-                    .getRate();
-        }
-
-        return amount.multiply(new BigDecimal(rateFrom / rateTo));
     }
 }

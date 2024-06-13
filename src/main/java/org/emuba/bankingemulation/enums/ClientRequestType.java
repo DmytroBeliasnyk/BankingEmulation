@@ -1,5 +1,5 @@
 package org.emuba.bankingemulation.enums;
 
 public enum ClientRequestType {
-    ACCOUNT_BALANCE, TRANSACTION_CONFIRMATION;
+    ACCOUNT_BALANCE, TRANSACTION_CONFIRMATION, CREDIT_INFO;
 }
