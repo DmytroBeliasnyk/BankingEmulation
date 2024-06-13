@@ -133,7 +133,7 @@ public class ClientController {
     }
 
     @GetMapping("transactions_between_date")
-    public List<TransactionDTO> getTransactionsByDate(@RequestParam String startDate,
+    public List<TransactionDTO> getTransactionsBetweenDate(@RequestParam String startDate,
                                                       @RequestParam String endDate,
                                                       @RequestParam(required = false, defaultValue = "0")
                                                       int page) {
