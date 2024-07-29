@@ -4,6 +4,7 @@ import org.emuba.bankingemulation.dto.TransactionDTO;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.models.CustomClient;
 import org.emuba.bankingemulation.models.TransactionHistory;
+import org.emuba.bankingemulation.repositories.ClientRepository;
 import org.emuba.bankingemulation.repositories.HistoryRepository;
 import org.emuba.bankingemulation.services.HistoryService;
 import org.springframework.data.domain.Pageable;
@@ -17,11 +18,12 @@ import java.util.List;
 @Service
 public class HistoryServiceImpl implements HistoryService {
     private final HistoryRepository historyRepository;
-    private final ClientServiceImpl clientService;
+    private final ClientRepository clientRepository;
 
-    public HistoryServiceImpl(HistoryRepository historyRepository, ClientServiceImpl clientService) {
+    public HistoryServiceImpl(HistoryRepository historyRepository,
+                              ClientRepository clientRepository) {
         this.historyRepository = historyRepository;
-        this.clientService = clientService;
+        this.clientRepository = clientRepository;
     }
 
     @Override
@@ -43,7 +45,7 @@ public class HistoryServiceImpl implements HistoryService {
     @Override
     @Transactional(readOnly = true)
     public List<TransactionDTO> findByClientLogin(String login, Pageable pageable) {
-        return historyRepository.findByClientId(clientService.findClientByLogin(login), pageable)
+        return historyRepository.findByClientId(clientRepository.findByLogin(login), pageable)
                 .stream()
                 .map(TransactionHistory::toDTO)
                 .toList();
@@ -53,7 +55,7 @@ public class HistoryServiceImpl implements HistoryService {
     @Transactional(readOnly = true)
     public List<TransactionDTO> findAllByDate(String login, LocalDate date, Pageable pageable) {
         return historyRepository.findAllByDate(
-                        clientService.findClientByLogin(login), date, pageable)
+                        clientRepository.findByLogin(login), date, pageable)
                 .stream()
                 .map(TransactionHistory::toDTO)
                 .toList();
@@ -65,7 +67,7 @@ public class HistoryServiceImpl implements HistoryService {
                                                    LocalDate startDate, LocalDate endDate,
                                                    Pageable pageable) {
         return historyRepository.findAllBetweenDate(
-                        clientService.findClientByLogin(login), startDate, endDate, pageable)
+                        clientRepository.findByLogin(login), startDate, endDate, pageable)
                 .stream()
                 .map(TransactionHistory::toDTO)
                 .toList();

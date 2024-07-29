@@ -5,6 +5,7 @@ import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.models.Account;
 import org.emuba.bankingemulation.models.CustomClient;
 import org.emuba.bankingemulation.repositories.AccountRepository;
+import org.emuba.bankingemulation.repositories.ClientRepository;
 import org.emuba.bankingemulation.services.AccountService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,26 +17,25 @@ import java.util.Optional;
 @Service
 public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
-    private final ClientServiceImpl clientService;
+    private final ClientRepository clientRepository;
     private final AccountNumberGenerator numberGenerator;
 
     public AccountServiceImpl(AccountRepository accountRepository,
-                              ClientServiceImpl clientService,
+                              ClientRepository clientRepository,
                               AccountNumberGenerator numberGenerator) {
         this.accountRepository = accountRepository;
-        this.clientService = clientService;
+        this.clientRepository = clientRepository;
         this.numberGenerator = numberGenerator;
     }
 
     @Override
     @Transactional
     public void addNewAccount(TypeCurrency currency, String login) {
-        if (findAccount(currency, login).isPresent())
+        if (accountRepository.findByCurrencyAndClient_Login(currency, login).isPresent())
             return;
-        CustomClient client = clientService.findClientByLogin(login);
+        CustomClient client = clientRepository.findByLogin(login);
 
-        Account newAccount = Account.of(numberGenerator.generateUniqueAccountNumber(),
-                currency);
+        Account newAccount = Account.of(numberGenerator.generateUniqueAccountNumber(), currency);
         client.addAccount(newAccount);
 
         accountRepository.save(newAccount);
@@ -64,7 +64,14 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public synchronized void updateBalance(Long clientId, TypeCurrency currency, BigDecimal newBalance) {
-        accountRepository.updateBalance(clientId, currency, newBalance);
+    public void updateBalance(Long clientId, TypeCurrency currency, BigDecimal newBalance) {
+        Account account = accountRepository.findByCurrencyAndClient_Id(currency, clientId)
+                .orElse(null);
+
+        if (account == null) return;
+
+        account.setBalance(newBalance);
+
+        accountRepository.save(account);
     }
 }

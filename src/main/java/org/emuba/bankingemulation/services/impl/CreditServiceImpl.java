@@ -5,6 +5,7 @@ import org.emuba.bankingemulation.enums.ClientRequestType;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 import org.emuba.bankingemulation.models.Credit;
 import org.emuba.bankingemulation.models.CustomClient;
+import org.emuba.bankingemulation.repositories.ClientRepository;
 import org.emuba.bankingemulation.repositories.CreditRepository;
 import org.emuba.bankingemulation.services.CreditService;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -20,15 +21,16 @@ import java.util.List;
 @Service
 public class CreditServiceImpl implements CreditService {
     private final CreditRepository creditRepository;
-    private final ClientServiceImpl clientService;
+    private final ClientRepository clientRepository;
     private final AccountServiceImpl accountService;
     private final SupportingMethodsForControllers supMethod;
     private final MailService mailService;
 
-    public CreditServiceImpl(CreditRepository creditRepository, ClientServiceImpl clientService,
-                             AccountServiceImpl accountService, SupportingMethodsForControllers supMethod, MailService mailService) {
+    public CreditServiceImpl(CreditRepository creditRepository, ClientRepository clientRepository,
+                             AccountServiceImpl accountService, SupportingMethodsForControllers supMethod,
+                             MailService mailService) {
         this.creditRepository = creditRepository;
-        this.clientService = clientService;
+        this.clientRepository = clientRepository;
         this.accountService = accountService;
         this.supMethod = supMethod;
         this.mailService = mailService;
@@ -36,8 +38,9 @@ public class CreditServiceImpl implements CreditService {
 
     @Override
     @Transactional
-    public CreditDTO save(String login, LocalDate startDate, LocalDate endDate, BigDecimal amount, TypeCurrency currency) {
-        CustomClient client = clientService.findClientByLogin(login);
+    public CreditDTO save(String login, LocalDate startDate, LocalDate endDate,
+                          BigDecimal amount, TypeCurrency currency) {
+        CustomClient client = clientRepository.findByLogin(login);
 
         Credit credit = Credit.of(startDate, endDate, amount, currency);
         client.addCredit(credit);
@@ -48,7 +51,7 @@ public class CreditServiceImpl implements CreditService {
     @Override
     @Transactional(readOnly = true)
     public List<CreditDTO> findAllCredits(String login) {
-        return creditRepository.findAllByClient(clientService.findClientByLogin(login))
+        return creditRepository.findAllByClient(clientRepository.findByLogin(login))
                 .stream()
                 .map(Credit::toDTO)
                 .toList();
@@ -57,7 +60,13 @@ public class CreditServiceImpl implements CreditService {
     @Override
     @Transactional
     public void updateCreditBalance(Long creditId, BigDecimal amount) {
-        creditRepository.updateBalance(creditId, amount);
+        Credit credit = creditRepository.findById(creditId).orElse(null);
+
+        if (credit == null) return;
+
+        credit.setAmount(amount);
+
+        creditRepository.save(credit);
     }
 
     @Override

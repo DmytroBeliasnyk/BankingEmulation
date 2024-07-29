@@ -1,15 +1,14 @@
 package org.emuba.bankingemulation.models;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.emuba.bankingemulation.dto.AccountDTO;
 import org.emuba.bankingemulation.enums.TypeCurrency;
 
 import java.math.BigDecimal;
 
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @Entity
@@ -38,5 +37,16 @@ public class Account {
 
     public AccountDTO toDTO() {
         return AccountDTO.of(accountNumber, currency, balance);
+    }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "id=" + id +
+                ", client=" + client.getName() + client.getSurname() +
+                ", accountNumber='" + accountNumber + '\'' +
+                ", currency=" + currency +
+                ", balance=" + balance +
+                '}';
     }
 }

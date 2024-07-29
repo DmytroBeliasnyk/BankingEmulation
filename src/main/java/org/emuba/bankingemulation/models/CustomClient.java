@@ -1,9 +1,7 @@
 package org.emuba.bankingemulation.models;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.emuba.bankingemulation.dto.AccountDTO;
 import org.emuba.bankingemulation.dto.ClientDTO;
 import org.emuba.bankingemulation.enums.UserRole;
@@ -12,7 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @Entity
@@ -62,5 +61,20 @@ public class CustomClient {
 
     public void addCredit(Credit credit) {
         if (credits.add(credit)) credit.setClient(this);
+    }
+
+    @Override
+    public String toString() {
+        return "CustomClient{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", email='" + email + '\'' +
+                ", login='" + login + '\'' +
+                ", password='" + password + '\'' +
+                ", role=" + role +
+                ", accounts=" + accounts +
+                ", credits=" + credits +
+                '}';
     }
 }

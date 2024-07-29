@@ -3,6 +3,7 @@ package org.emuba.bankingemulation.services.impl;
 import org.emuba.bankingemulation.dto.ClientRequestDTO;
 import org.emuba.bankingemulation.enums.ClientRequestType;
 import org.emuba.bankingemulation.models.ClientRequest;
+import org.emuba.bankingemulation.repositories.ClientRepository;
 import org.emuba.bankingemulation.repositories.ClientRequestRepository;
 import org.emuba.bankingemulation.services.ClientRequestService;
 import org.springframework.data.domain.Pageable;
@@ -14,17 +15,18 @@ import java.util.List;
 @Service
 public class ClientRequestServiceImpl implements ClientRequestService {
     private final ClientRequestRepository clientRequestRepository;
-    private final ClientServiceImpl clientService;
+    private final ClientRepository clientRepository;
 
-    public ClientRequestServiceImpl(ClientRequestRepository clientRequestRepository, ClientServiceImpl clientService) {
+    public ClientRequestServiceImpl(ClientRequestRepository clientRequestRepository,
+                                    ClientRepository clientRepository) {
         this.clientRequestRepository = clientRequestRepository;
-        this.clientService = clientService;
+        this.clientRepository = clientRepository;
     }
 
     @Override
     @Transactional
     public void add(String login, ClientRequestType clientRequestType, Long transactionId) {
-        clientRequestRepository.save(ClientRequest.of(clientService.findClientByLogin(login),
+        clientRequestRepository.save(ClientRequest.of(clientRepository.findByLogin(login),
                 clientRequestType, transactionId));
     }
 
@@ -45,7 +47,8 @@ public class ClientRequestServiceImpl implements ClientRequestService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ClientRequestDTO> getAllByType(ClientRequestType clientRequestType, Pageable pageable) {
+    public List<ClientRequestDTO> getAllByType(ClientRequestType clientRequestType,
+                                               Pageable pageable) {
         return clientRequestRepository.findAllByClientRequestType(clientRequestType, pageable)
                 .stream()
                 .map(ClientRequest::toDTO)

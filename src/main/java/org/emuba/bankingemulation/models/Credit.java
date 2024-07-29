@@ -35,7 +35,7 @@ public class Credit {
         this.endDate = endDate;
         this.amount = amount;
         this.currency = currency;
-        onePayment = amount.divide(new BigDecimal(startDate.until(endDate).getMonths()));
+        onePayment = amount.divide(new BigDecimal(startDate.until(endDate).toTotalMonths()), 2, BigDecimal.ROUND_HALF_UP);
     }
 
     public static Credit of(LocalDate startDate, LocalDate endDate, BigDecimal amount, TypeCurrency currency) {
