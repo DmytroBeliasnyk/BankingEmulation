@@ -41,14 +41,13 @@ public class AuthController {
         if (!EmailUtils.isValidEmailAddress(registerDTO.getEmail()))
             return new ResponseEntity<>("Invalid email address", HttpStatus.BAD_REQUEST);
 
-        String passHash = encoder.encode(registerDTO.getPassword());
-
         clientService.addClient(
                 registerDTO.getName(),
                 registerDTO.getSurname(),
                 registerDTO.getEmail(),
                 registerDTO.getLogin(),
-                passHash, UserRole.USER);
+                encoder.encode(registerDTO.getPassword()),
+                UserRole.USER);
 
         return new ResponseEntity<>("Success", HttpStatus.CREATED);
     }
@@ -65,8 +64,8 @@ public class AuthController {
         } catch (BadCredentialsException e) {
             return new ResponseEntity<>("Invalid login or password", HttpStatus.BAD_REQUEST);
         }
-        String token = jwtGenerator.generateToken(authentication);
 
-        return new ResponseEntity<>(new TokenDTO(token), HttpStatus.OK);
+        return new ResponseEntity<>(new TokenDTO(jwtGenerator.generateToken(authentication)),
+                HttpStatus.OK);
     }
 }

@@ -1,8 +1,12 @@
 package org.emuba.bankingemulation.dto.auth;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
 public class RegisterDTO {
     private String name;
     private String surname;
